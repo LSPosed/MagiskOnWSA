@@ -3,7 +3,7 @@
 ## Usage
 
 1. Fork this repo
-1. Go to Action tab and select workflow `Magisk`, click the run button and enter the needed infomation (architecture and magisk apk download link)
+1. Go to Action tab and select workflow `Magisk`, click the run button and enter the needed infomation (magisk apk download link)
 1. Wait the action complete and download the artifact
 1. Uninstall WSA
 1. Unzip the artifact

@@ -6,14 +6,13 @@ on:
       magisk_apk:
         description: 'Download link to magisk apk.'
         required: true
-      arch:
-        description: 'Architecture to build. Should be x64 or arm64.'
-        required: true 
-        default: 'x64'
 
 jobs:
   build:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        arch: [x64, arm64]
     steps:
       - name: Dependencies
         run: |
@@ -40,7 +39,7 @@ jobs:
 
           out_file = "wsa.zip"
 
-          arch = "${{ github.event.inputs.arch }}"
+          arch = "${{ matrix.arch }}"
 
           if not os.path.isfile(out_file):
               urllib.request.urlretrieve(link, out_file)
@@ -71,7 +70,7 @@ jobs:
 
           out_file = "magisk.zip"
 
-          arch = "${{ github.event.inputs.arch }}"
+          arch = "${{ matrix.arch }}"
 
           abi_map={"x64" : ["x86_64", "x86"], "arm64" : ["arm64-v8a", "armeabi-v7a"]}
 
@@ -90,13 +89,13 @@ jobs:
               extract_as(zip, f"lib/{ abi_map['x64'][0] }/libmagiskinit.so", "magiskpolicy", "magisk")
       - name: Expand images
         run: |
-          e2fsck -yf ${{ github.event.inputs.arch }}/vendor.img
-          resize2fs ${{ github.event.inputs.arch }}/vendor.img 320M
+          e2fsck -yf ${{ matrix.arch }}/vendor.img
+          resize2fs ${{ matrix.arch }}/vendor.img 320M
       - name: Mount images
         run: |
           sudo mkdir system
-          sudo mount -o loop ${{ github.event.inputs.arch }}/system.img system
-          sudo mount -o loop ${{ github.event.inputs.arch }}/vendor.img system/vendor
+          sudo mount -o loop ${{ matrix.arch }}/system.img system
+          sudo mount -o loop ${{ matrix.arch }}/vendor.img system/vendor
       - name: Modify images
         run: |
           sudo mkdir system/sbin
@@ -160,15 +159,15 @@ jobs:
           sudo umount system
       - name: Shrink images
         run: |
-          e2fsck -yf ${{ github.event.inputs.arch }}/system.img
-          resize2fs ${{ github.event.inputs.arch }}/system.img
-          e2fsck -yf ${{ github.event.inputs.arch }}/vendor.img
-          resize2fs ${{ github.event.inputs.arch }}/vendor.img
+          e2fsck -yf ${{ matrix.arch }}/system.img
+          resize2fs ${{ matrix.arch }}/system.img
+          e2fsck -yf ${{ matrix.arch }}/vendor.img
+          resize2fs ${{ matrix.arch }}/vendor.img
       - name: Remove signature
         run: |
-          rm -rf ${{ github.event.inputs.arch }}/\[Content_Types\].xml ${{ github.event.inputs.arch }}/AppxBlockMap.xml ${{ github.event.inputs.arch }}/AppxSignature.p7x ${{ github.event.inputs.arch }}/AppxMetadata
+          rm -rf ${{ matrix.arch }}/\[Content_Types\].xml ${{ matrix.arch }}/AppxBlockMap.xml ${{ matrix.arch }}/AppxSignature.p7x ${{ matrix.arch }}/AppxMetadata
       - name: Upload WSA
         uses: actions/upload-artifact@v2
         with:
-          name: WSA-with-Magisk
-          path: './${{ github.event.inputs.arch }}/*'
+          name: WSA-with-Magisk_${{ matrix.arch }}
+          path: './${{ matrix.arch }}/*'

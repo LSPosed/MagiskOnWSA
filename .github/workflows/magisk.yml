@@ -170,5 +170,5 @@ jobs:
       - name: Upload WSA
         uses: actions/upload-artifact@v2
         with:
-          name: WSA-with-Magisk
+          name: WSA-with-Magisk_${{ github.event.inputs.arch }}
           path: './${{ github.event.inputs.arch }}/*'

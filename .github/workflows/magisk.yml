@@ -160,8 +160,11 @@ jobs:
       - name: Remove signature
         run: |
           rm -rf ${{ github.event.inputs.arch }}/\[Content_Types\].xml ${{ github.event.inputs.arch }}/AppxBlockMap.xml ${{ github.event.inputs.arch }}/AppxSignature.p7x ${{ github.event.inputs.arch }}/AppxMetadata
+      - name: Compress
+        run: |
+          7z a -mx=9 "WSA-with-Magisk_${{ github.event.inputs.arch }}.7z" ./${{ github.event.inputs.arch }}/
       - name: Upload WSA
         uses: actions/upload-artifact@v2
         with:
-          name: WSA-with-Magisk
-          path: './${{ github.event.inputs.arch }}/*'
+          name: WSA-with-Magisk_${{ github.event.inputs.arch }}
+          path: './WSA-with-Magisk_${{ github.event.inputs.arch }}.7z'

@@ -1,9 +1,9 @@
 # Magisk on WSA
 
 ## Features
-- Integrate Magisk and OpenGApps in a few clicks within minus
-- No Linux environment is required for the integration
-- Keep latest on each build
+- Integrate Magisk and OpenGApps in a few clicks within minutes
+- No Linux environment required for integration
+- Keep each build up to date
 - Support both ARM64 and x64
 
 ## Usage

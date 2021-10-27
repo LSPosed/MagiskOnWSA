@@ -7,8 +7,8 @@
 1. Wait the action complete and download the artifact
 1. Uninstall WSA
 1. Unzip the artifact
-1. Enable deveop mode on Windows
-1. Open powershell with admin permission and run `Add-AppxPackage -Register .\AppxManifest.xml` under the unzipped artifact directory
+1. Enable develop mode on Windows
+1. Open powershell with admin privileges and run `Add-AppxPackage -Register .\AppxManifest.xml` under the unzipped artifact directory
 1. Launch WSA and enable develop mode, launch the file manager, and wait until the file manager popup
 1. Run `adb connect localhost:58526` to connect to WSA and install Magisk app (the one you use to build) and launch it
 1. Fix the environment as Magisk app will prompt and reboot

@@ -555,7 +555,7 @@ jobs:
           if [[ "$variant" = "none" || "$variant" = "" ]]; then
             echo "artifact_name=WSA-with-Magisk-NoGApps_${{ matrix.arch }}" >> $GITHUB_ENV
           else
-            echo "artifact_name=WSA-with-Magisk-GApps-$variant_${{ matrix.arch }}" >> $GITHUB_ENV
+            echo "artifact_name=WSA-with-Magisk-GApps-${variant}_${{ matrix.arch }}" >> $GITHUB_ENV
           fi
       - name: Upload WSA
         uses: actions/upload-artifact@v2

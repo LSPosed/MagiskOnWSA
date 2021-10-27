@@ -555,8 +555,16 @@ jobs:
       - name: Remove signature
         run: |
           rm -rf ${{ matrix.arch }}/\[Content_Types\].xml ${{ matrix.arch }}/AppxBlockMap.xml ${{ matrix.arch }}/AppxSignature.p7x ${{ matrix.arch }}/AppxMetadata
+      - name: Generate artifact name
+        run: |
+          variant="${{ github.event.inputs.gapps_variant }}"
+          if [[ "$variant" = "none" || "$variant" = "" ]]; then
+            echo "artifact_name=WSA-with-Magisk_${{ matrix.arch }}" >> $GITHUB_ENV
+          else
+            echo "artifact_name=WSA-with-Magisk-GApps_${{ matrix.arch }}" >> $GITHUB_ENV
+          fi
       - name: Upload WSA
         uses: actions/upload-artifact@v2
         with:
-          name: WSA-with-Magisk_${{ matrix.arch }}
+          name: ${{ env.artifact_name }}
           path: './${{ matrix.arch }}/*'

@@ -25,7 +25,7 @@
 1. Enable developer mode on Windows
 1. Follow the video [https://www.youtube.com/watch?v=EFV-fM81Tzs](https://www.youtube.com/watch?v=EFV-fM81Tzs) or the next instructions :
 1. (If you have already install WSA, uninstall with `Remove-AppxPackage MicrosoftCorporationII.WindowsSubsystemForAndroid_1.7.32815.0_x64__8wekyb3d8bbwe -AllUsers` in powershell with admin privileges)
-1. In powershell, run `Add-AppxPackage -Register .\AppxManifest.xml` under the unzipped artifact directory (`import-module appx -usewindowspowershell` if Add-AppxPackage dosn't work)
+1. In powershell, run `Add-AppxPackage -Register .\AppxManifest.xml` under the unzipped artifact directory (`import-module appx -usewindowspowershell` if Add-AppxPackage doesn't work)
 1. Launch WSA and enable developer mode, launch the file manager, and wait until the file manager popup
 1. Run `adb connect @IP` to connect to WSA and install Magisk app `adb install magisk.apk` (the one you use to build) and launch it
 1. Fix the environment as Magisk app will prompt and reboot (sometimes it keeps prompting even after environment fix, just ignore it)

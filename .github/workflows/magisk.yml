@@ -25,7 +25,7 @@ jobs:
         run: |
           pip3 install beautifulsoup4 lxml
           sudo apt-get update && sudo apt-get install setools lzip
-      - name: Download AWS
+      - name: Download WSA
         shell: python
         run: |
           import requests

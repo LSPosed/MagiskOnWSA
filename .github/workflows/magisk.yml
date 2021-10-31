@@ -215,8 +215,9 @@ jobs:
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         run: |
           wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- --strip-component=2 '*/x64/gapps/*'
-          sudo cp -r gapps/{app,etc,framework,priv-app} system/system
-          sudo cp -r gapps/product/* system/product/
+          shopt -s extglob
+          sudo cp -vr gapps/!(product) system/system
+          sudo cp -vr gapps/product/* system/product/
 
           sudo find system/system/{app,etc,framework,priv-app} -exec chown root:root {} \;
           sudo find system/product/{app,etc,overlay,priv-app} -exec chown root:root {} \;
@@ -225,15 +226,15 @@ jobs:
           sudo find system/product/{app,etc,overlay,priv-app} -type d -exec chmod 0755 {} \;
 
           sudo find system/system/{app,framework,priv-app} -type f -exec chmod 0644 {} \;
-          sudo find system/system/etc/{permissions,default-permissions,preferred-apps,sysconfig} -type f -exec chmod 0644 {} \;
+          ls gapps/etc/ | xargs -n 1 -I dir sudo find system/system/etc/dir -type f -exec chmod 0644 {} \;
           sudo find system/product/{app,etc,overlay,priv-app} -type f -exec chmod 0644 {} \;
 
           sudo find system/system/{app,framework,priv-app} -type d -exec chcon --reference=system/system/app {} \;
           sudo find system/product/{app,etc,overlay,priv-app} -type d -exec chcon --reference=system/product/app {} \;
-          sudo find system/system/etc/{permissions,default-permissions,preferred-apps,sysconfig} -type d -exec chcon --reference=system/system/etc/permissions {} \;
+          ls gapps/etc/ | xargs -n 1 -I dir sudo find system/system/etc/dir -type d -exec chcon --reference=system/system/etc/permissions {} \;
 
           sudo find system/system/{app,framework,priv-app} -type f -exec chcon --reference=system/system/framework/ext.jar {} \;
-          sudo find system/system/etc/{permissions,default-permissions,preferred-apps,sysconfig} -type f -exec chcon --reference=system/system/etc/permissions {} \;
+          ls gapps/etc/ | xargs -n 1 -I dir sudo find system/system/etc/dir -type f -exec chcon --reference=system/system/etc/permissions {} \;
           sudo find system/product/{app,etc,overlay,priv-app} -type f -exec chcon --reference=system/product/etc/permissions/privapp-permissions-venezia.xml {} \;
 
           sudo ./magisk/magiskpolicy --load system/vendor/etc/selinux/precompiled_sepolicy --save system/vendor/etc/selinux/precompiled_sepolicy "allow gmscore_app gmscore_app vsock_socket { create connect write read }" "allow gmscore_app device_config_runtime_native_boot_prop file read"

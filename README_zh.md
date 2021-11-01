@@ -1,4 +1,4 @@
-# Windows11 安卓子系统上的 Magisk
+# Magisk on WSA
 
 ## 特性
 - 只需按几下分分钟将Magisk和OpenGApps整合

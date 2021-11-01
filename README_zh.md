@@ -1,4 +1,4 @@
-# Magisk(Windows11 安卓子系统专版)
+# Windows11 安卓子系统上的 Magisk
 
 ## 特性
 - 只需按几下分分钟将Magisk和OpenGApps整合

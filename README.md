@@ -21,7 +21,7 @@
     ![Run Workflow](https://docs.github.com/assets/images/actions-manually-run-workflow.png)
 1. Wait the action complete and download the artifact
     ![Download](https://docs.github.com/assets/images/help/repository/artifact-drop-down-updated.png)
-1. Unzip the artifact and uninstall WSA if you have an official installation or replace the pevious unzipped artifact if you have a manual installation
+1. Unzip the artifact and uninstall WSA if you have an official installation or replace the previous unzipped artifact if you have a manual installation
 1. Enable developer mode on Windows
 1. Right click `Install.ps1` and select `Run with PowerShell`
 1. Launch WSA and enable developer mode, launch the file manager, and wait until the file manager popup

@@ -1,11 +1,11 @@
-# Magisk(Windows11 安装子系统专版)
+# Magisk(Windows11 安卓子系统专版)
 
 ## 特性
-- 只需按几下分分钟将Magisk 和 OpenGApps 整合
+- 只需按几下分分钟将Magisk和OpenGApps整合
 - 整合工作不需要Linux环境
 - 保持每一次的build最新
-- ARM64 和 x64都支持
-- 所有OpenGApps变体(版本)
+- ARM64 和 x64 都支持
+- 支持所有OpenGApps变体(版本)
 - 修复外部存储的DocumentUI
 
 ## 用法
@@ -21,8 +21,8 @@
     ![Run Workflow](https://docs.github.com/assets/images/actions-manually-run-workflow.png)
 1. 等待action完成 然后下载 artifact
     ![Download](https://docs.github.com/assets/images/help/repository/artifact-drop-down-updated.png)
-1. 解压artifact 然后卸载 WSA 如果你有一个官方版本, 或者替换现有的已解压的artifact如果你有手动安装的WSA
-1. 在Windows开启开发者模式
+1. 解压 artifact 然后卸载 WSA 如果你有一个官方版本, 或者替换现有的已解压的artifact如果你有手动安装的WSA
+1. 在Windows设置里开启开发者模式
 1. 右键点击 `Install.ps1` 然后选择`Run with PowerShell`
 1. 启动WSA然后启用开发者模式, 启动文件管理器, 然后等到文件管理器启动
 1. 确认你有[Platform tools](https://developer.android.com/studio/releases/platform-tools), 运行 `adb connect localhost:58526` 以连接WSA,用 `adb install magisk.apk` 来安装Magisk App (你用于build的那个) 然后启动它

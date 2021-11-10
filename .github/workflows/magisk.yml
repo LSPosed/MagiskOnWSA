@@ -153,7 +153,7 @@ jobs:
           sudo mount -o loop ${{ matrix.arch }}/product.img system/product
           sudo mount -o loop ${{ matrix.arch }}/system_ext.img system/system_ext
       - name: Integrate Magisk
-        if: ${{ github.event.inputs.gapps_variant == 'magisk' || github.event.inputs.gapps_variant == '' }}
+        if: ${{ github.event.inputs.root_sol == 'magisk' }}
         run: |
           sudo mkdir system/sbin
           sudo chcon --reference system/init.environ.rc system/sbin

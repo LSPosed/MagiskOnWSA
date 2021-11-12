@@ -65,14 +65,12 @@ jobs:
                           zip.extract(f)
                           ver_no = zip_name.split("_")
                           ver = ver_no[1]
-                          f = open("ver.txt", "w")
-                          f.write(ver)
-                          f.close()
+                          with open(os.environ['GITHUB_ENV'], 'a') as f:
+                              f.write(f'WSA_VER={ver}')
                           rel = ver_no[3].split(".")
                           rell = str(rel[0])
-                          f = open("rel.txt", "w")
-                          f.write(rell)
-                          f.close()
+                          with open(os.environ['GITHUB_ENV'], 'a') as f:
+                              f.write(f'WSA_REL={rell}')
                       break
 
           with zipfile.ZipFile(zip_name) as zip:
@@ -369,8 +367,6 @@ jobs:
         run: |
           variant="${{ github.event.inputs.gapps_variant }}"
           root="${{ github.event.inputs.root_sol }}"
-          version=`cat ver.txt`
-          release=`cat rel.txt`
           if [[ "$root" = "none" ]]; then
             name1=""
           elif [[ "$root" = "" ]]; then
@@ -383,7 +379,7 @@ jobs:
           else
             name2="-GApps-${variant}"
           fi
-          echo "artifact_name=WSA${name1}${name2}_${version}_${{ matrix.arch }}_${release}" >> $GITHUB_ENV
+          echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_RELL }}" >> $GITHUB_ENV
       - name: Upload WSA
         uses: actions/upload-artifact@v2
         with:

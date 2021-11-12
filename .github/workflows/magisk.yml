@@ -66,11 +66,11 @@ jobs:
                           ver_no = zip_name.split("_")
                           ver = ver_no[1]
                           with open(os.environ['GITHUB_ENV'], 'a') as f:
-                              f.write(f'WSA_VER={ver}')
+                              f.write(f'WSA_VER={ver}\n')
                           rel = ver_no[3].split(".")
                           rell = str(rel[0])
                           with open(os.environ['GITHUB_ENV'], 'a') as f:
-                              f.write(f'WSA_REL={rell}')
+                              f.write(f'WSA_REL={rell}\n')
                       break
 
           with zipfile.ZipFile(zip_name) as zip:
@@ -379,7 +379,7 @@ jobs:
           else
             name2="-GApps-${variant}"
           fi
-          echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_RELL }}" >> $GITHUB_ENV
+          echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
       - name: Upload WSA
         uses: actions/upload-artifact@v2
         with:

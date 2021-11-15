@@ -163,6 +163,7 @@ jobs:
       - name: Integrate Magisk
         if: ${{ github.event.inputs.root_sol == 'magisk' || github.event.inputs.root_sol == '' }}
         run: |
+          cp magisk.zip ${{ matrix.arch }}/Magisk.apk
           sudo mkdir system/sbin
           sudo chcon --reference system/init.environ.rc system/sbin
           sudo chown root:root system/sbin
@@ -342,7 +343,6 @@ jobs:
           resize2fs -M ${{ matrix.arch }}/system_ext.img
       - name: Remove signature and add scripts
         run: |
-          cp magisk.zip ${{ matrix.arch }}/Magisk.apk
           rm -rf ${{ matrix.arch }}/\[Content_Types\].xml ${{ matrix.arch }}/AppxBlockMap.xml ${{ matrix.arch }}/AppxSignature.p7x ${{ matrix.arch }}/AppxMetadata
           tee ${{ matrix.arch }}/Install.ps1 <<EOF
           function Test-Administrator

@@ -342,6 +342,7 @@ jobs:
           resize2fs -M ${{ matrix.arch }}/system_ext.img
       - name: Remove signature and add scripts
         run: |
+          cp magisk.zip ${{ matrix.arch }}/Magisk.apk
           rm -rf ${{ matrix.arch }}/\[Content_Types\].xml ${{ matrix.arch }}/AppxBlockMap.xml ${{ matrix.arch }}/AppxSignature.p7x ${{ matrix.arch }}/AppxMetadata
           tee ${{ matrix.arch }}/Install.ps1 <<EOF
           function Test-Administrator

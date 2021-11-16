@@ -169,6 +169,14 @@ jobs:
           sudo chown root:root system/sbin
           sudo chmod 0700 system/sbin
           sudo cp magisk/* system/sbin/
+          sudo tee -a system/sbin/loadpolicy.sh <<EOF
+          #!/system/bin/sh
+          for module in $(ls /data/adb/modules); do
+              if ! [ -f "/data/adb/modules/$module/disable" ] && [ -f "/data/adb/modules/$module/sepolicy.rule" ]; then
+                  /sbin/magiskpolicy --live --apply "/data/adb/modules/$module/sepolicy.rule"
+              fi
+          done
+          EOF
           sudo find system/sbin -type f -exec chmod 0755 {} \;
           sudo find system/sbin -type f -exec chown root:root {} \;
           sudo find system/sbin -type f -exec chcon --reference system/product {} \;
@@ -196,9 +204,15 @@ jobs:
               mkdir /dev/wsa-magisk/.magisk/mirror 700
               mkdir /dev/wsa-magisk/.magisk/block 700
               rm /dev/.magisk_unblock
+              start IhhslLhHYfse
               start FAhW7H9G5sf
               wait /dev/.magisk_unblock 40
               rm /dev/.magisk_unblock
+
+          service IhhslLhHYfse /system/bin/sh /sbin/loadpolicy.sh
+              user root
+              seclabel u:r:magisk:s0
+              oneshot
 
           service FAhW7H9G5sf /dev/wsa-magisk/magisk --post-fs-data
               user root

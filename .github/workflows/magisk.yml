@@ -355,10 +355,16 @@ jobs:
           resize2fs -M ${{ matrix.arch }}/product.img
           e2fsck -yf ${{ matrix.arch }}/system_ext.img
           resize2fs -M ${{ matrix.arch }}/system_ext.img
+      - name: add ADB
+        run: |
+        wget https://dl.google.com/android/repository/platform-tools-latest-windows.zip -Oadb.zip
+        unzip adb.zip
+        cp platform-tools/?db* ${{ matrix.arch }}/.
       - name: Remove signature and add scripts
         run: |
           rm -rf ${{ matrix.arch }}/\[Content_Types\].xml ${{ matrix.arch }}/AppxBlockMap.xml ${{ matrix.arch }}/AppxSignature.p7x ${{ matrix.arch }}/AppxMetadata
           tee ${{ matrix.arch }}/Install.ps1 <<EOF
+          tee ./Install.ps1 <<EOF
           function Test-Administrator
           {
               [OutputType([bool])]
@@ -377,6 +383,18 @@ jobs:
 
           \$ErrorActionPreference = "Stop";
           Add-AppxPackage -Register .\AppxManifest.xml
+          Start-Process shell:appsFolder\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe!SettingsApp
+          if (Test-Path "./Magisk.apk") {
+              Read-Host  "1. In WSA Settings App, activate DEVELOPER MODE. Press ENTER when done..."
+              Write-Host "2. In WSA Settings App, Open 'Manage developer settings'. Wait for the new options menu to open."
+              Read-Host  "***Press ENTER only when you see the menu options to continue with the installation."
+              Write-Host "Installing Magisk App..."
+              ./platform-tools/adb connect localhost:58526
+              ./platform-tools/adb install Magisk.apk
+              Start-Sleep -s 5
+              \$wsapath = \$env:LOCALAPPDATA + "\Microsoft\WindowsApps\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe"
+              cmd /c \$wsapath\WsaClient.exe /launch wsa://com.topjohnwu.magisk
+          }
           EOF
       - name: Generate artifact name
         run: |

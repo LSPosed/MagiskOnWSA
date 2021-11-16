@@ -17,7 +17,7 @@
     ![Workflow](https://docs.github.com/assets/images/actions-select-workflow.png)
 1. Above the list of workflow runs, select **Run workflow**
     ![Run Workflow](https://docs.github.com/assets/images/actions-workflow-dispatch.png)
-1. Input the download link of Magisk and select the [OpenGApps variant](https://github.com/opengapps/opengapps/wiki#variants) (none is no OpenGApps) you like and click **Run workflow**
+1. Input the download link of Magisk and select the [OpenGApps variant](https://github.com/opengapps/opengapps/wiki#variants) (none is no OpenGApps) you like, select the root solution (none means no root) and click **Run workflow**
     ![Run Workflow](https://docs.github.com/assets/images/actions-manually-run-workflow.png)
 1. Wait for the action to complete and download the artifact
     ![Download](https://docs.github.com/assets/images/help/repository/artifact-drop-down-updated.png)
@@ -25,9 +25,8 @@
 1. Enable developer mode on Windows
 1. Right-click `Install.ps1` and select `Run with PowerShell`
 1. Launch WSA and enable developer mode, launch the file manager, and wait until the file manager popup
-1. Make sure you have [Platform tools](https://developer.android.com/studio/releases/platform-tools), run `adb connect localhost:58526` to connect to WSA, `adb install magisk.apk` to install Magisk App (the one you used to build) and launch it
-1. Fix the environment as the Magisk app will prompt and reboot (sometimes it keeps prompting even after environment fix, just ignore it)
-1. Enjoy by installing Riru and LSPosed
+1. If you use Magisk as root solution, make sure you have [Platform tools](https://developer.android.com/studio/releases/platform-tools), run `adb connect localhost:58526` to connect to WSA, `adb install magisk.apk` to install Magisk App (the one you used to build, included in the zip artifacts as `Magisk.apk`), launch it and fix the environment as the Magisk app will prompt and reboot (sometimes it keeps prompting even after environment fix, just ignore it)
+1. Enjoy by installing LSPosed-zygisk with zygisk enabled or Riru and LSPosed-riru
 
 ## Video Demo
 

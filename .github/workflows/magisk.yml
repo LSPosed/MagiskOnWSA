@@ -1,5 +1,4 @@
 name: Magisk
-
 on:
   push:
   pull_request:
@@ -388,8 +387,8 @@ jobs:
               Write-Host "2. In WSA Settings App, Open 'Manage developer settings'. Wait for the new options menu to open."
               Read-Host  "***Press ENTER only when you see the menu options to continue with the installation."
               Write-Host "Installing Magisk App..."
-              ./platform-tools/adb connect localhost:58526
-              ./platform-tools/adb install Magisk.apk
+              ./adb connect localhost:58526
+              ./adb install Magisk.apk
               Start-Sleep -s 5
               \$wsapath = \$env:LOCALAPPDATA + "\Microsoft\WindowsApps\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe"
               cmd /c \$wsapath\WsaClient.exe /launch wsa://com.topjohnwu.magisk

@@ -357,9 +357,9 @@ jobs:
           resize2fs -M ${{ matrix.arch }}/system_ext.img
       - name: add ADB
         run: |
-        wget https://dl.google.com/android/repository/platform-tools-latest-windows.zip -Oadb.zip
-        unzip adb.zip
-        cp platform-tools/?db* ${{ matrix.arch }}/.
+          wget https://dl.google.com/android/repository/platform-tools-latest-windows.zip -Oadb.zip
+          unzip adb.zip
+          cp platform-tools/?db* ${{ matrix.arch }}/.
       - name: Remove signature and add scripts
         run: |
           rm -rf ${{ matrix.arch }}/\[Content_Types\].xml ${{ matrix.arch }}/AppxBlockMap.xml ${{ matrix.arch }}/AppxSignature.p7x ${{ matrix.arch }}/AppxMetadata

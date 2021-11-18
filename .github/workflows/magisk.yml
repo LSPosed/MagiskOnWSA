@@ -360,6 +360,7 @@ jobs:
           unzip adb.zip platform-tools/?db*
           cp platform-tools/?db* ${{ matrix.arch }}/.
           rm -r platform-tools
+          rm adb.zip
       - name: Remove signature and add scripts
         run: |
           rm -rf ${{ matrix.arch }}/\[Content_Types\].xml ${{ matrix.arch }}/AppxBlockMap.xml ${{ matrix.arch }}/AppxSignature.p7x ${{ matrix.arch }}/AppxMetadata

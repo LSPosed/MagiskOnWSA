@@ -357,7 +357,7 @@ jobs:
       - name: add ADB
         run: |
           wget https://dl.google.com/android/repository/platform-tools-latest-windows.zip -Oadb.zip
-          unzip adb.zip
+          unzip adb.zip platform-tools/?db*
           cp platform-tools/?db* ${{ matrix.arch }}/.
       - name: Remove signature and add scripts
         run: |

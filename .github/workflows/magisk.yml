@@ -5,17 +5,17 @@ on:
   workflow_dispatch:
     inputs:
       magisk_apk:
-        description: 'Download link to magisk apk.'
+        description: "Download link to magisk apk."
         required: true
-        default: 'https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk'
+        default: "https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk"
       gapps_variant:
-        description: 'Variants of gapps. Should be: [none, aroma, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]'
+        description: "Variants of gapps. Should be: [none, aroma, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]"
         required: true
-        default: 'none'
+        default: "none"
       root_sol:
-        description: 'Root soluction. Should be: [magisk, none]'
+        description: "Root soluction. Should be: [magisk, none]"
         required: true
-        default: 'magisk'
+        default: "magisk"
 
 jobs:
   build:
@@ -384,15 +384,14 @@ jobs:
           Add-AppxPackage -Register .\AppxManifest.xml
           Start-Process shell:appsFolder\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe!SettingsApp
           if (Test-Path "./Magisk.apk") {
-              Read-Host  "1. In WSA Settings App, activate DEVELOPER MODE. Press ENTER when done..."
-              Write-Host "2. In WSA Settings App, Open 'Manage developer settings'. Wait for the new options menu to open."
-              Read-Host  "***Press ENTER only when you see the menu options to continue with the installation."
+              Write-Host "1. In WSA Settings App, activate DEVELOPER MODE."
+              Write-Host "2. In WSA Settings App, Open 'Manage developer settings'." 
+              Write-Host "3. Wait for the new options menu to open."
               Write-Host "Installing Magisk App..."
-              ./adb connect localhost:58526
+              ./adb kill-server
+              while (!(./adb connect localhost:58526).Contains("connected")){}
               ./adb install Magisk.apk
-              Start-Sleep -s 5
-              \$wsapath = \$env:LOCALAPPDATA + "\Microsoft\WindowsApps\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe"
-              cmd /c \$wsapath\WsaClient.exe /launch wsa://com.topjohnwu.magisk
+              adb shell monkey -p com.topjohnwu.magisk -v 500
           }
           EOF
       - name: Generate artifact name
@@ -416,4 +415,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.artifact_name }}
-          path: './${{ matrix.arch }}/*'
+          path: "./${{ matrix.arch }}/*"

@@ -391,7 +391,7 @@ jobs:
               ./adb kill-server
               while (!(./adb connect localhost:58526).Contains("connected")){}
               ./adb install Magisk.apk
-              adb shell monkey -p com.topjohnwu.magisk -c android.intent.category.LAUNCHER 1
+              ./adb shell monkey -p com.topjohnwu.magisk -c android.intent.category.LAUNCHER 1
           }
           EOF
       - name: Generate artifact name

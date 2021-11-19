@@ -383,7 +383,7 @@ jobs:
               exit
           }
           \$ErrorActionPreference = "Stop"
-          reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWO RD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
+          reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
           Add-AppxPackage -Register .\AppxManifest.xml
           if (Test-Path "./Magisk.apk") {
               Write-Output "Magisk detected, installing..."

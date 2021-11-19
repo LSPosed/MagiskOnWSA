@@ -385,8 +385,15 @@ jobs:
           \$ErrorActionPreference = "Stop";
           Add-AppxPackage -Register .\AppxManifest.xml
           if (Test-Path "./Magisk.apk") {
-              do{start-sleep -s 0.5}until((get-process).Name -contains "wsaclient")
-              Stop-Process -Name WsaClient
+              Write-Output "Magisk detected, installing..."
+              \$i = 20
+              do{
+                  start-sleep -s 0.5
+                  \$i--
+              }until( (\$i -eq 0) -or ((get-process).Name -contains "wsaclient") )
+              if ((get-process).Name -contains "wsaclient") {
+                  Stop-Process -Name WsaClient
+              }
               \$regHive = "\$env:LOCALAPPDATA/Packages/MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe/Settings/settings.dat"
               \$regMountPoint = "HKLM\WSA"
               Write-Output "Mounting WSA registry hive"

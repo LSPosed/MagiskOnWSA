@@ -78,6 +78,7 @@ jobs:
                   zip.extractall(arch)
           print("done", flush=True)
       - name: Download Magisk
+        if: ${{ github.event.inputs.root_sol == 'magisk' || github.event.inputs.root_sol == '' }}
         shell: python
         run: |
           import urllib.request

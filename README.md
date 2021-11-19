@@ -24,8 +24,6 @@
 1. Unzip the artifact and uninstall WSA if you have an official installation or replace the previously unzipped artifact if you have a manual installation
 1. Enable developer mode on Windows
 1. Right-click `Install.ps1` and select `Run with PowerShell`
-1. Launch WSA and enable developer mode, launch the file manager, and wait until the file manager popup
-1. If you use Magisk as root solution, make sure you have [Platform tools](https://developer.android.com/studio/releases/platform-tools), run `adb connect localhost:58526` to connect to WSA, `adb install magisk.apk` to install Magisk App (the one you used to build, included in the zip artifacts as `Magisk.apk`), launch it and fix the environment as the Magisk app will prompt and reboot (sometimes it keeps prompting even after environment fix, just ignore it)
 1. Enjoy by installing LSPosed-zygisk with zygisk enabled or Riru and LSPosed-riru
 
 ## Video Demo

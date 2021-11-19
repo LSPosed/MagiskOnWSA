@@ -7,6 +7,9 @@
 - Support both ARM64 and x64
 - Support all OpenGApps variants
 - Fix external storage access of DocumentUI
+- Unatended installation
+- Automatically activates developers mode in Windows 11
+- Automatically activates developer mode in WSA
 
 ## Usage
 
@@ -22,7 +25,6 @@
 1. Wait for the action to complete and download the artifact
     ![Download](https://docs.github.com/assets/images/help/repository/artifact-drop-down-updated.png)
 1. Unzip the artifact and uninstall WSA if you have an official installation or replace the previously unzipped artifact if you have a manual installation
-1. Enable developer mode on Windows
 1. Right-click `Install.ps1` and select `Run with PowerShell`
 1. Enjoy by installing LSPosed-zygisk with zygisk enabled or Riru and LSPosed-riru
 

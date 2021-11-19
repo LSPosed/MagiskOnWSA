@@ -356,6 +356,7 @@ jobs:
           e2fsck -yf ${{ matrix.arch }}/system_ext.img
           resize2fs -M ${{ matrix.arch }}/system_ext.img
       - name: add ADB
+        if: ${{ github.event.inputs.root_sol == 'magisk' || github.event.inputs.root_sol == '' }}
         run: |
           wget https://dl.google.com/android/repository/platform-tools-latest-windows.zip -Oadb.zip
           unzip adb.zip platform-tools/?db*

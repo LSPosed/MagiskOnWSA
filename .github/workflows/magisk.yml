@@ -1,4 +1,4 @@
-name: Magisk
+name: Build WSA
 on:
   push:
   pull_request:

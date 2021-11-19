@@ -409,9 +409,9 @@ jobs:
               start-process "\$env:LOCALAPPDATA/Microsoft/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe/WsaClient.exe" -Args "/launch wsa://com.amazon.venezia"
               Write-Output "Waiting for the Android system to boot for the first time..."
               adb kill-server
-              do{}until((adb connect localhost:58526).Contains("connected"))
+              do{}until((./adb connect localhost:58526).Contains("connected"))
               do{
-                  \$output=(adb devices)
+                  \$output=(./adb devices)
                   foreach(\$line in \$output){
                       if(\$line.Contains("localhost")){
                           \$connection=\$line

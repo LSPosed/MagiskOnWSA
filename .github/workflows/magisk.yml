@@ -365,6 +365,8 @@ jobs:
         run: |
           rm -rf ${{ matrix.arch }}/\[Content_Types\].xml ${{ matrix.arch }}/AppxBlockMap.xml ${{ matrix.arch }}/AppxSignature.p7x ${{ matrix.arch }}/AppxMetadata
           tee ${{ matrix.arch }}/Install.ps1 <<EOF
+          # Automated Install script by Mioki
+          # http://github.com/okibcn
           function Test-Administrator
           {
               [OutputType([bool])]
@@ -380,19 +382,48 @@ jobs:
               Start-Process -Verb RunAs powershell.exe -Args "-executionpolicy bypass -command Set-Location \`"\$PSScriptRoot\`"; \`"\$PSCommandPath\`""
               exit
           }
-
           \$ErrorActionPreference = "Stop";
           Add-AppxPackage -Register .\AppxManifest.xml
-          Start-Process shell:appsFolder\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe!SettingsApp
           if (Test-Path "./Magisk.apk") {
-              Write-Host "1. In WSA Settings App, activate DEVELOPER MODE."
-              Write-Host "2. In WSA Settings App, Open 'Manage developer settings'." 
-              Write-Host "3. Wait for the new options menu to open."
-              Write-Host "Installing Magisk App..."
-              ./adb kill-server
-              while (!(./adb connect localhost:58526).Contains("connected")){}
+              do{start-sleep -s 0.5}until((get-process).Name -contains "wsaclient")
+              Stop-Process -Name WsaClient
+              \$regHive = "\$env:LOCALAPPDATA/Packages/MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe/Settings/settings.dat"
+              \$regMountPoint = "HKLM\WSA"
+              Write-Output "Mounting WSA registry hive"
+              reg load \$regMountPoint \$regHive
+              \$develbit = "1"
+              \$reg  = "Windows Registry Editor Version 5.00\`n\`n"
+              \$reg += "[HKEY_LOCAL_MACHINE\WSA]\`n\`n"
+              \$reg += "[HKEY_LOCAL_MACHINE\WSA\LocalState]\`n"
+              \$reg += "\`"DeveloperModeEnabled\`"=hex(5f5e10b):0"+ \$develbit + ",07,b9,6f,f3,d3,dc,d7,01\`n"
+              \$reg += "\`"OptionalDiagnosticDataEnabled\`"=hex(5f5e10b):00,dc,38,ba,75,ec,dc,d7,01\`n"
+              \$reg | Out-File "./wsa.reg"
+              Write-Output "Patching WSA registry..."
+              reg import "./wsa.reg"
+              rm -force wsa*.reg
+              [gc]::collect()
+              start-sleep -s 3
+              Write-Output "Unmounting patched WSA registry hive."
+              reg unload \$regMountPoint
+              Write-Output "starting an App to force the creation of the rw sdcard"
+              start-process "\$env:LOCALAPPDATA/Microsoft/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe/WsaClient.exe" -Args "/launch wsa://com.amazon.venezia"
+              Write-Output "Waiting for the Android system to boot for the first time..."
+              adb kill-server
+              do{}until((adb connect localhost:58526).Contains("connected"))
+              do{
+                  \$output=(adb devices)
+                  foreach(\$line in \$output){
+                      if(\$line.Contains("localhost")){
+                          \$connection=\$line
+                      }
+                  }
+              }until(\$connection.Contains("device"))
+              Write-Output "WSA loaded and Developer mode is ON."
+              do{start-sleep -s 0.5}until(./adb shell "ps -d | grep 'com.amazon.venezia'")
+              ./adb shell am force-stop com.amazon.venezia
+              Write-Output "Installing Magisk App..."
               ./adb install Magisk.apk
-              ./adb shell monkey -p com.topjohnwu.magisk -c android.intent.category.LAUNCHER 1
+              adb shell monkey -p com.topjohnwu.magisk -c android.intent.category.LAUNCHER 1
           }
           EOF
       - name: Generate artifact name

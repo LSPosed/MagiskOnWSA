@@ -1,22 +1,21 @@
 name: Magisk
-
 on:
   push:
   pull_request:
   workflow_dispatch:
     inputs:
       magisk_apk:
-        description: 'Download link to magisk apk.'
+        description: "Download link to magisk apk."
         required: true
-        default: 'https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk'
+        default: "https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk"
       gapps_variant:
-        description: 'Variants of gapps. Should be: [none, aroma, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]'
+        description: "Variants of gapps. Should be: [none, aroma, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]"
         required: true
-        default: 'none'
+        default: "none"
       root_sol:
-        description: 'Root soluction. Should be: [magisk, none]'
+        description: "Root soluction. Should be: [magisk, none]"
         required: true
-        default: 'magisk'
+        default: "magisk"
 
 jobs:
   build:
@@ -355,10 +354,19 @@ jobs:
           resize2fs -M ${{ matrix.arch }}/product.img
           e2fsck -yf ${{ matrix.arch }}/system_ext.img
           resize2fs -M ${{ matrix.arch }}/system_ext.img
+      - name: add ADB
+        run: |
+          wget https://dl.google.com/android/repository/platform-tools-latest-windows.zip -Oadb.zip
+          unzip adb.zip platform-tools/?db*
+          cp platform-tools/?db* ${{ matrix.arch }}/.
+          rm -r platform-tools
+          rm adb.zip
       - name: Remove signature and add scripts
         run: |
           rm -rf ${{ matrix.arch }}/\[Content_Types\].xml ${{ matrix.arch }}/AppxBlockMap.xml ${{ matrix.arch }}/AppxSignature.p7x ${{ matrix.arch }}/AppxMetadata
           tee ${{ matrix.arch }}/Install.ps1 <<EOF
+          # Automated Install script by Mioki
+          # http://github.com/okibcn
           function Test-Administrator
           {
               [OutputType([bool])]
@@ -374,9 +382,57 @@ jobs:
               Start-Process -Verb RunAs powershell.exe -Args "-executionpolicy bypass -command Set-Location \`"\$PSScriptRoot\`"; \`"\$PSCommandPath\`""
               exit
           }
-
-          \$ErrorActionPreference = "Stop";
+          \$ErrorActionPreference = "Stop"
+          reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
           Add-AppxPackage -Register .\AppxManifest.xml
+          if (Test-Path "./Magisk.apk") {
+              Write-Output "Magisk detected, installing..."
+              \$i = 20
+              do{
+                  start-sleep -s 0.5
+                  \$i--
+              }until( (\$i -eq 0) -or ((get-process).Name -contains "wsaclient") )
+              if ((get-process).Name -contains "wsaclient") {
+                  Stop-Process -Name WsaClient
+              }
+              \$regHive = "\$env:LOCALAPPDATA/Packages/MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe/Settings/settings.dat"
+              \$regMountPoint = "HKLM\WSA"
+              Write-Output "Mounting WSA registry hive"
+              reg load \$regMountPoint \$regHive
+              \$develbit = "1"
+              \$reg  = "Windows Registry Editor Version 5.00\`n\`n"
+              \$reg += "[HKEY_LOCAL_MACHINE\WSA]\`n\`n"
+              \$reg += "[HKEY_LOCAL_MACHINE\WSA\LocalState]\`n"
+              \$reg += "\`"DeveloperModeEnabled\`"=hex(5f5e10b):0"+ \$develbit + ",07,b9,6f,f3,d3,dc,d7,01\`n"
+              \$reg += "\`"OptionalDiagnosticDataEnabled\`"=hex(5f5e10b):00,dc,38,ba,75,ec,dc,d7,01\`n"
+              \$reg | Out-File "./wsa.reg"
+              Write-Output "Patching WSA registry..."
+              reg import "./wsa.reg"
+              rm -force wsa*.reg
+              [gc]::collect()
+              start-sleep -s 3
+              Write-Output "Unmounting patched WSA registry hive."
+              reg unload \$regMountPoint
+              Write-Output "starting an App to force the creation of the rw sdcard"
+              start-process "\$env:LOCALAPPDATA/Microsoft/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe/WsaClient.exe" -Args "/launch wsa://com.amazon.venezia"
+              Write-Output "Waiting for the Android system to boot for the first time..."
+              ./adb kill-server
+              do{}until((./adb connect localhost:58526).Contains("connected"))
+              do{
+                  \$output=(./adb devices)
+                  foreach(\$line in \$output){
+                      if(\$line.Contains("localhost")){
+                          \$connection=\$line
+                      }
+                  }
+              }until(\$connection.Contains("device"))
+              Write-Output "WSA loaded and Developer mode is ON."
+              do{start-sleep -s 0.5}until(./adb shell "ps -d | grep 'com.amazon.venezia'")
+              ./adb shell am force-stop com.amazon.venezia
+              Write-Output "Installing Magisk App..."
+              ./adb install Magisk.apk
+              ./adb shell monkey -p com.topjohnwu.magisk -c android.intent.category.LAUNCHER 1
+          }
           EOF
       - name: Generate artifact name
         run: |
@@ -399,4 +455,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.artifact_name }}
-          path: './${{ matrix.arch }}/*'
+          path: "./${{ matrix.arch }}/*"

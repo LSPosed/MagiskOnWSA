@@ -140,7 +140,7 @@ jobs:
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         run: |
           mkdir gapps
-          unzip -p gapps.zip {Core,GApps}/'*.lz' | tar --lzip -C gapps -xvf - -i --strip-components=2 --exclude='setupwizardtablet-x86_64' --exclude='packageinstallergoogle-all' --exclude='speech-common' --exclude='markup-lib-arm' --exclude='markup-lib-arm64' --exclude='markup-all' --exclude='setupwizarddefault-x86_64'
+          unzip -p gapps.zip {Core,GApps}/'*.lz' | tar --lzip -C gapps -xvf - -i --strip-components=2 --exclude='setupwizardtablet-x86_64' --exclude='packageinstallergoogle-all' --exclude='speech-common' --exclude='markup-lib-arm' --exclude='markup-lib-arm64' --exclude='markup-all' --exclude='setupwizarddefault-x86_64' --exclude='pixellauncher-all' --exclude='pixellauncher-common'
 
           e2fsck -yf ${{ matrix.arch }}/system.img
           resize2fs ${{ matrix.arch }}/system.img $(( $(du -sB512 gapps | cut -f1) + $(du -sB512 ${{ matrix.arch }}/system.img | cut -f1) ))s

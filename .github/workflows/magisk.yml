@@ -470,15 +470,23 @@ jobs:
           \$Installed = \$null
           \$Installed = Get-AppxPackage -Name 'MicrosoftCorporationII.WindowsSubsystemForAndroid'
 
-          If ((\$null -ne \$Installed) -and (-not (\$Installed.IsDevelopmentMode))) {
-              Clear-Host
-              Write-Warning "There is already one installed WSA. Please uninstall it first.\`r\`nPress y to uninstall existing WSA or press any key to exit"
-              \$key = \$Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
-              If ("y" -eq \$key.Character) {
-                  Remove-AppxPackage -Package \$Installed.PackageFullName
+          If (\$null -ne \$Installed) {
+              if (\$Installed.IsDevelopmentMode) {
+                  New-Item -ItemType Directory -Force -Path backup
+                  \$PackageFamilyName = \$Installed.PackageFamilyName
+                  \$backup = "backup\userdata.vhdx"
+                  Copy-Item "\$env:LOCALAPPDATA\Packages\\$PackageFamilyName\LocalCache\userdata.vhdx" -Destination \$backup
               }
               Else {
-                  exit 1
+                  Clear-Host
+                  Write-Warning "There is already one installed WSA. Please uninstall it first.`r`nPress y to uninstall existing WSA or press any key to exit"
+                  \$key = \$Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+                  If ("y" -eq \$key.Character) {
+                      Remove-AppxPackage -Package \$Installed.PackageFullName
+                  }
+                  Else {
+                      exit 1
+                  }
               }
           }
           Clear-Host
@@ -486,6 +494,10 @@ jobs:
           Stop-Process -Name "wsaclient"
           Add-AppxPackage -ForceApplicationShutdown -ForceUpdateFromAnyVersion -Register .\AppxManifest.xml
           if (\$?) {
+              if (\$null -ne \$backup) {
+                  \$PackageFamilyName = \$Installed.PackageFamilyName
+                  Copy-Item \$backup -Destination "\$env:LOCALAPPDATA\Packages\\$PackageFamilyName\LocalCache\userdata.vhdx"
+              }
               Finish
           }
           Elseif (\$null -ne \$Installed) {

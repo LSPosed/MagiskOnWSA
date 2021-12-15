@@ -35,6 +35,50 @@ https://user-images.githubusercontent.com/5022927/145696886-e13ebfc1-ff25-4410-8
     - If you have an official WSA installation, you should uninstall it first. (In case you want to preserve your data, you can backup `%LOCALAPPDATA%\Packages\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe\LocalCache\userdata.vhdx` before uninstallation and restore it after installation.)
 1. Magisk/Play store will be launched. Enjoy by installing LSPosed-zygisk with zygisk enabled or Riru and LSPosed-riru
 
+## FAQ
+- Can I delete the unzipped folder?
+
+    No.
+- Why the size of the zip does not match the one shown?
+
+   The zip you downloaded is compressed and Github is showing the uncompressed size.
+- How can I update WSA to new version?
+
+    Rerun the Github action, download the new artifact, replace the content of your previous installation and rerun `Install.ps1`. Don't worry, your data will be preserved.
+- How can I get the logcat from WSA?
+
+    `%LOCALAPPDATA%\Packages\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe\LocalState\diagnostics\logcat`
+- How can I update Magisk to new version?
+
+    Do the same as updating WSA
+- VPN is not working?
+
+    Tell Microsoft to fix it. We cannot fix it easily.
+- How to pass safetynet?
+
+    Like all the other emulators, no way.
+- Virtualization is not enabled?
+
+    `Install.ps1` helps you enable it if not enabled. After rebooting, rerun `Install.ps1` to install WSA. If it's still not working, you have to enable virualization in BIOS. That's a long story so ask Google for help.
+- How to remount system as read-write?
+
+    No way in WSA since it's mounted as read-only by Hyper-V. You can modify system by making a Magisk module. Or directly modify system.img. Ask Google for help.
+- I cannot `adb connect localhost:58526`
+
+    Make sure developer mode is enabled. If the issue persists, check the ip address of WSA in the setting page and try `adb connect ip:5555`.
+- Magisk online module list is empty?
+
+    Magisk actively remove online module repository. You can install module locally or by `adb push module.zip /data/local/tmp` and `adb shell su -c magisk --install-module /data/local/tmp/module.zip`.
+- Can I use Magisk 23.0 stable or lower version?
+
+    No. Magisk has bugs preventing itself running on WSA. Magisk Canary has fixed them. So try Magisk 23 canary or higher version.
+- But Magisk has removed hide since 23 canary?
+
+    Use [Magisk Alpha](https://t.me/magiskalpha) or use Zygisk with [Shamiko](https://t.me/c/1414270883/25744) for hidding. To intergrate Magisk Alpha, get Magisk apk link from this file: https://github.com/vvb2060/magisk_files/blob/alpha/alpha.json for the Github Action.
+- How can I get rid of Magisk?
+
+    Input `none` as root solution.
+
 ## Credits
 - [Magisk](https://github.com/topjohnwu/Magisk): The most famous root solution on Android
 - [The Open GApps Project](https://opengapps.org): One of the most famous Google Apps packages solution

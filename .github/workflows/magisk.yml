@@ -500,6 +500,72 @@ jobs:
           Write-Host "All Done\`r\`nPress any key to exit"
           \$null = \$Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
           EOF
+          tee ${{ matrix.arch }}/RunIfYouLostAppShortcuts.ps1 <<EOF
+          # Script To Resinstall Apps Without Losing Data (Used to recreate App Shortcuts For WSA)
+          # https://github.com/itsyourap
+          Write-Warning "Please Connect to the device using adb first before continuing with this script"
+          \$decision = \$Host.UI.PromptForChoice('Use this Script only after you have replaced userdata.vhdx', 'Are you sure you want to proceed?', ('&Yes', '&No'), 1)
+          if (\$decision -eq 0) {
+              Clear-Host
+              Write-Host -NoNewline "Getting Total Number of Installed User Apps... - "
+              \$applicationPackages = @(adb shell pm list packages -3"|cut -f 2 -d ":)
+              \$totalPackages = \$applicationPackages.Count
+              if (\$totalPackages -eq 0){
+                  Exit
+              }
+              Write-Host \$totalPackages
+              \$approxTimeReq = [timespan]::fromseconds(\$totalPackages * 10)
+              \$decision = \$Host.UI.PromptForChoice(-join("Approximate Time Required : ", \$approxTimeReq.ToString("hh\:mm\:ss")), 'Are you sure you want to proceed?', ('&Yes', '&No'), 1)
+              if (\$decision -eq 0){
+                  Write-Host "\`n"
+                  foreach (\$package in \$applicationPackages) {
+                      \$apkPath = adb shell pm path \$package"|cut -f 2 -d ":
+                      Write-Host -NoNewline "Refreshing Package \$package... "
+                      if (\$apkPath.Count -eq 1){
+                          # Application is not a Split Package
+                          \$reinstallStatus = adb shell pm install -r \$apkPath
+                          if (\$reinstallStatus -match "Success") {
+                              Write-Host "Success"
+                          } else {
+                              Write-Host "Failure"
+                          }
+                      } elseif (\$apkPath.Count -gt 1) {
+                          # Application is a Split Package
+                          \$apkFolder = \$apkPath[0].Substring(0, (\$apkPath[0].LastIndexOf('/')))
+                          [Int32]\$sizeOfPackages = 0
+                          \$sizes = adb shell stat -c %s \$apkFolder/*.apk
+                          foreach (\$size in \$sizes) {
+                              \$sizeOfPackages = \$sizeOfPackages + [int32]\$size
+                          }
+                          \$installSession = adb shell pm install-create -r -S \$sizeOfPackages
+                          \$sessionID = \$installSession.Substring((\$installSession.IndexOf('[') + 1), ((\$installSession.IndexOf(']') - 1) - \$installSession.IndexOf('[')))
+                          \$install = \$true
+                          \$i = 0
+                          foreach (\$apk in \$apkPath) {
+                              \$size = adb shell stat -c %s \$apk
+                              \$output = adb shell pm install-write -S \$size \$sessionID \$i \$apk
+                              if (\$output -notmatch "Success") {
+                                  \$install = \$false
+                                  break
+                              }
+                              \$i++
+                          }
+                         if (\$install -eq \$true){
+                              \$result = adb shell pm install-commit \$sessionID
+                              if (\$result -match "Success"){
+                                   Write-Host "Success"
+                              } else {
+                                  Write-Host "Failure"
+                              }
+                          } else {
+                              adb shell pm install-abandon \$sessionID
+                              Write-Host "Failure"
+                          }
+                      }
+                  }
+              }
+          }
+          EOF
       - name: Generate artifact name
         run: |
           variant="${{ github.event.inputs.gapps_variant }}"

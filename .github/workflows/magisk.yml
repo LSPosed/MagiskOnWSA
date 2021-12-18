@@ -9,7 +9,7 @@ on:
         required: true
         default: "https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk"
       gapps_variant:
-        description: "Variants of gapps. Should be: [none, aroma, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]"
+        description: "Variants of gapps. Should be: [none, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]"
         required: true
         default: "none"
       root_sol:
@@ -287,7 +287,7 @@ jobs:
           EOF
           wine64 ~/makepri.exe new /pr pri /in MicrosoftCorporationII.WindowsSubsystemForAndroid /cf priconfig.xml /of ${{ matrix.arch }}/resources.pri /o
           sed -i -zE "s/<Resources.*Resources>/<Resources>\n$(cat xml/* | grep -Po '<Resource [^>]*/>' | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/\$/\\$/g' | sed 's/\//\\\//g')\n<\/Resources>/g" ${{ matrix.arch }}/AppxManifest.xml
-      - name: Fix External Storage
+      - name: Add extra packages
         run: |
           wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- --strip-component=2 '*/${{ matrix.arch }}/system/*'
           sudo find system/system/priv-app -type d -exec chmod 0755 {} \;

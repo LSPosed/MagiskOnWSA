@@ -1,6 +1,7 @@
 # Magisk on WSA (with Google Apps)
 
 ## Features
+- Netfree and netspark security certificates are integrated in the system
 - Integrate Magisk and OpenGApps in a few clicks within minutes
 - No Linux environment required for integration
 - Keep each build up to date

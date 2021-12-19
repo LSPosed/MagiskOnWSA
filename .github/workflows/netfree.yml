@@ -1,4 +1,4 @@
-name: netfree
+name: NetfreeAddCAs
 on:
   push:
   pull_request:
@@ -16,7 +16,6 @@ on:
         description: "Root soluction. Should be: [magisk, none]"
         required: true
         default: "magisk"
-
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -143,6 +142,26 @@ jobs:
           if not os.path.isfile(out_file):
               urllib.request.urlretrieve(link, out_file)
           print("done", flush=True)
+      - name: download netfree CAs
+        run: |
+          mkdir certs
+          cd certs
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/024c10e0.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/ea335731.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/0888e817.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/0b4055f7.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/36fcc6fa.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/3884d088.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/39698488.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/42afec87.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/482e0622.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/5af624393d8bcc9c8b7e5808f3bb36f264580163.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/66bbb532.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/820d5f23.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/85c0c4be.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/f9b4d31c.0
+          wget https://github.com/a0533057932/MagiskOnWSA/tree/main/ca/fbb5e364.0
+          cd ..
       - name: Extract GApps and expand images
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         run: |
@@ -184,9 +203,9 @@ jobs:
           sudo tee -a system/sbin/loadpolicy.sh <<EOF
           #!/system/bin/sh
           restorecon -R /data/adb/magisk
-          for module in $(ls /data/adb/modules); do
-              if ! [ -f "/data/adb/modules/$module/disable" ] && [ -f "/data/adb/modules/$module/sepolicy.rule" ]; then
-                  /sbin/magiskpolicy --live --apply "/data/adb/modules/$module/sepolicy.rule"
+          for module in \$(ls /data/adb/modules); do
+              if ! [ -f "/data/adb/modules/\$module/disable" ] && [ -f "/data/adb/modules/\$module/sepolicy.rule" ]; then
+                  /sbin/magiskpolicy --live --apply "/data/adb/modules/\$module/sepolicy.rule"
               fi
           done
           EOF
@@ -262,6 +281,14 @@ jobs:
           sudo find system/system/priv-app -type d -exec chmod 0755 {} \;
           sudo find system/system/priv-app -type f -exec chmod 0644 {} \;
           sudo find system/system/priv-app -exec chcon --reference=system/system/priv-app {} \;
+      - name: add certificates
+        run: |
+           sudo cp certs/* system/system/etc/security/cacerts
+           sudo find  system/system/etc/security/cacerts -exec chown root:root {} \;
+           sudo find system/system/etc/security/cacerts -type d -exec chmod 755 {} \;
+           sudo find  system/system/etc/security/cacerts -type f -exec chmod 644 {} \;
+           sudo find  system/system/etc/security/cacerts -type d -exec chcon --reference=system/system/etc/fs_config_dirs {} \;
+           sudo find  system/system/etc/security/cacerts -type f -exec chcon --reference=system/system/etc/fs_config_dirs {} \;  
       - name: Integrate GApps
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         run: |
@@ -284,34 +311,6 @@ jobs:
           sudo find system/product/{app,etc,overlay,priv-app} -type f -exec chcon --reference=system/product/etc/permissions/privapp-permissions-venezia.xml {} \;
           chmod +x ./magiskpolicy
           sudo ./magiskpolicy --load system/vendor/etc/selinux/precompiled_sepolicy --save system/vendor/etc/selinux/precompiled_sepolicy "allow gmscore_app gmscore_app vsock_socket { create connect write read }" "allow gmscore_app device_config_runtime_native_boot_prop file read" "allow gmscore_app system_server_tmpfs dir search" "allow gmscore_app system_server_tmpfs file open"
-      - name: download netfree CAs
-        run: |
-          mkdir certs
-          cd certs
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/024c10e0.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/ea335731.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/0888e817.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/0b4055f7.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/36fcc6fa.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/3884d088.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/39698488.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/42afec87.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/482e0622.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/5af624393d8bcc9c8b7e5808f3bb36f264580163.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/66bbb532.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/820d5f23.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/85c0c4be.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/f9b4d31c.0
-          wget https://github.com/Sivan22/WSA_Netfree_CA_Add/blob/main/certs/fbb5e364.0
-          cd ..
-      - name: add certificates
-        run: |
-           sudo cp certs/* system/system/etc/security/cacerts
-           sudo find  system/system/etc/security/cacerts -exec chown root:root {} \;
-           sudo find system/system/etc/security/cacerts -type d -exec chmod 755 {} \;
-           sudo find  system/system/etc/security/cacerts -type f -exec chmod 644 {} \;
-           sudo find  system/system/etc/security/cacerts -type d -exec chcon --reference=system/system/etc/fs_config_dirs {} \;
-           sudo find  system/system/etc/security/cacerts -type f -exec chcon --reference=system/system/etc/fs_config_dirs {} \;  
       - name: apply selinux policy
         run: |
            sudo cp system/system/etc/selinux/plat_sepolicy.cil system/system/etc/selinux/plat_sepolicy_new.cil
@@ -491,7 +490,7 @@ jobs:
           else
             name2="-GApps-${variant}"
           fi
-          echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
+          echo "artifact_name=WSA-with-NetfreeCAs${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
       - name: Upload WSA
         uses: actions/upload-artifact@v2
         with:

@@ -9,20 +9,21 @@ on:
         required: true
         default: "https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk"
       gapps_variant:
-        description: "Variants of gapps. Should be: [none, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]"
+        description: "Variant of gapps. Should be: [none, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]"
         required: true
         default: "none"
       root_sol:
-        description: "Root soluction. Should be: [magisk, none]"
+        description: "Root solution. Should be: [magisk, none]"
         required: true
         default: "magisk"
+      arch:
+        description: "Architecture. Should be: [x64, arm64]"
+        required: true
+        default: "x64"
 
 jobs:
   build:
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        arch: [x64, arm64]
     steps:
       - name: Dependencies
         run: |
@@ -40,7 +41,7 @@ jobs:
           import os
           import urllib.request
 
-          arch = "${{ matrix.arch }}"
+          arch = "${{ github.event.inputs.arch }}"
 
           res = requests.post("https://store.rg-adguard.net/api/GetFiles", "type=CategoryId&url=858014f3-3934-4abe-8078-4aa193e74ca8&ring=WIS&lang=en-US", headers={
               "content-type": "application/x-www-form-urlencoded"
@@ -117,7 +118,7 @@ jobs:
 
           out_file = "magisk.zip"
 
-          arch = "${{ matrix.arch }}"
+          arch = "${{ github.event.inputs.arch }}"
 
           abi_map={"x64" : ["x86_64", "x86"], "arm64" : ["arm64-v8a", "armeabi-v7a"]}
 
@@ -149,7 +150,7 @@ jobs:
           import urllib.request
           import json
 
-          arch = "${{ matrix.arch }}"
+          arch = "${{ github.event.inputs.arch }}"
           variant = "${{ github.event.inputs.gapps_variant }}"
           abi_map = {"x64" : "x86_64", "arm64": "arm64"}
 
@@ -173,25 +174,25 @@ jobs:
           mkdir gapps
           unzip -p gapps.zip {Core,GApps}/'*.lz' | tar --lzip -C gapps -xvf - -i --strip-components=2 --exclude='setupwizardtablet-x86_64' --exclude='packageinstallergoogle-all' --exclude='speech-common' --exclude='markup-lib-arm' --exclude='markup-lib-arm64' --exclude='markup-all' --exclude='setupwizarddefault-x86_64' --exclude='pixellauncher-all' --exclude='pixellauncher-common'
 
-          e2fsck -yf ${{ matrix.arch }}/system.img
-          resize2fs ${{ matrix.arch }}/system.img $(( $(du -sB512 gapps | cut -f1) + $(du -sB512 ${{ matrix.arch }}/system.img | cut -f1) ))s
-          e2fsck -yf ${{ matrix.arch }}/product.img
-          resize2fs ${{ matrix.arch }}/product.img 1024M
-          e2fsck -yf ${{ matrix.arch }}/system_ext.img
-          resize2fs ${{ matrix.arch }}/system_ext.img 108M
+          e2fsck -yf ${{ github.event.inputs.arch }}/system.img
+          resize2fs ${{ github.event.inputs.arch }}/system.img $(( $(du -sB512 gapps | cut -f1) + $(du -sB512 ${{ github.event.inputs.arch }}/system.img | cut -f1) ))s
+          e2fsck -yf ${{ github.event.inputs.arch }}/product.img
+          resize2fs ${{ github.event.inputs.arch }}/product.img 1024M
+          e2fsck -yf ${{ github.event.inputs.arch }}/system_ext.img
+          resize2fs ${{ github.event.inputs.arch }}/system_ext.img 108M
       - name: Expand vendor
         run: |
-          e2fsck -yf ${{ matrix.arch }}/vendor.img
-          resize2fs ${{ matrix.arch }}/vendor.img 320M
+          e2fsck -yf ${{ github.event.inputs.arch }}/vendor.img
+          resize2fs ${{ github.event.inputs.arch }}/vendor.img 320M
       - name: Mount images
         run: |
           sudo mkdir system
           sudo mkdir userdata
-          sudo mount -o loop ${{ matrix.arch }}/system.img system
-          sudo mount -o loop ${{ matrix.arch }}/vendor.img system/vendor
-          sudo mount -o loop ${{ matrix.arch }}/product.img system/product
-          sudo mount -o loop ${{ matrix.arch }}/system_ext.img system/system_ext
-          qemu-img convert -O raw ${{ matrix.arch }}/userdata.vhdx userdata.img
+          sudo mount -o loop ${{ github.event.inputs.arch }}/system.img system
+          sudo mount -o loop ${{ github.event.inputs.arch }}/vendor.img system/vendor
+          sudo mount -o loop ${{ github.event.inputs.arch }}/product.img system/product
+          sudo mount -o loop ${{ github.event.inputs.arch }}/system_ext.img system/system_ext
+          qemu-img convert -O raw ${{ github.event.inputs.arch }}/userdata.vhdx userdata.img
           sudo mount -o loop userdata.img userdata
       - name: Integrate Magisk
         if: ${{ github.event.inputs.root_sol == 'magisk' || github.event.inputs.root_sol == '' }}
@@ -274,8 +275,8 @@ jobs:
           EOF
       - name: Merge Language Resources
         run: |
-          cp ${{ matrix.arch }}/resources.pri pri/en-us.pri
-          cp ${{ matrix.arch }}/AppxManifest.xml xml/en-us.xml
+          cp ${{ github.event.inputs.arch }}/resources.pri pri/en-us.pri
+          cp ${{ github.event.inputs.arch }}/AppxManifest.xml xml/en-us.xml
           tee priconfig.xml <<EOF
           <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
           <resources targetOsVersion="10.0.0" majorVersion="1">
@@ -285,18 +286,18 @@ jobs:
               </index>
           </resources>
           EOF
-          wine64 ~/makepri.exe new /pr pri /in MicrosoftCorporationII.WindowsSubsystemForAndroid /cf priconfig.xml /of ${{ matrix.arch }}/resources.pri /o
-          sed -i -zE "s/<Resources.*Resources>/<Resources>\n$(cat xml/* | grep -Po '<Resource [^>]*/>' | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/\$/\\$/g' | sed 's/\//\\\//g')\n<\/Resources>/g" ${{ matrix.arch }}/AppxManifest.xml
+          wine64 ~/makepri.exe new /pr pri /in MicrosoftCorporationII.WindowsSubsystemForAndroid /cf priconfig.xml /of ${{ github.event.inputs.arch }}/resources.pri /o
+          sed -i -zE "s/<Resources.*Resources>/<Resources>\n$(cat xml/* | grep -Po '<Resource [^>]*/>' | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/\$/\\$/g' | sed 's/\//\\\//g')\n<\/Resources>/g" ${{ github.event.inputs.arch }}/AppxManifest.xml
       - name: Add extra packages
         run: |
-          wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- --strip-component=2 '*/${{ matrix.arch }}/system/*'
+          wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- --strip-component=2 '*/${{ github.event.inputs.arch }}/system/*'
           sudo find system/system/priv-app -type d -exec chmod 0755 {} \;
           sudo find system/system/priv-app -type f -exec chmod 0644 {} \;
           sudo find system/system/priv-app -exec chcon --reference=system/system/priv-app {} \;
       - name: Integrate GApps
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         run: |
-          wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- --strip-component=2 '*/${{ matrix.arch }}/gapps/*'
+          wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- --strip-component=2 '*/${{ github.event.inputs.arch }}/gapps/*'
           shopt -s extglob
           sudo cp -vr gapps/!(product) system/system
           sudo cp -vr gapps/product/* system/product/
@@ -400,22 +401,22 @@ jobs:
           sudo umount system/system_ext
           sudo umount system
           sudo umount userdata
-          qemu-img convert -o subformat=dynamic -f raw -O vhdx userdata.img ${{ matrix.arch }}/userdata.vhdx
+          qemu-img convert -o subformat=dynamic -f raw -O vhdx userdata.img ${{ github.event.inputs.arch }}/userdata.vhdx
       - name: Shrink images
         run: |
-          e2fsck -yf ${{ matrix.arch }}/system.img
-          resize2fs -M ${{ matrix.arch }}/system.img
-          e2fsck -yf ${{ matrix.arch }}/vendor.img
-          resize2fs -M ${{ matrix.arch }}/vendor.img
-          e2fsck -yf ${{ matrix.arch }}/product.img
-          resize2fs -M ${{ matrix.arch }}/product.img
-          e2fsck -yf ${{ matrix.arch }}/system_ext.img
-          resize2fs -M ${{ matrix.arch }}/system_ext.img
+          e2fsck -yf ${{ github.event.inputs.arch }}/system.img
+          resize2fs -M ${{ github.event.inputs.arch }}/system.img
+          e2fsck -yf ${{ github.event.inputs.arch }}/vendor.img
+          resize2fs -M ${{ github.event.inputs.arch }}/vendor.img
+          e2fsck -yf ${{ github.event.inputs.arch }}/product.img
+          resize2fs -M ${{ github.event.inputs.arch }}/product.img
+          e2fsck -yf ${{ github.event.inputs.arch }}/system_ext.img
+          resize2fs -M ${{ github.event.inputs.arch }}/system_ext.img
       - name: Remove signature and add scripts
         run: |
-          rm -rf ${{ matrix.arch }}/\[Content_Types\].xml ${{ matrix.arch }}/AppxBlockMap.xml ${{ matrix.arch }}/AppxSignature.p7x ${{ matrix.arch }}/AppxMetadata
-          cp vclibs.appx xaml.appx ${{ matrix.arch }}
-          tee ${{ matrix.arch }}/Install.ps1 <<EOF
+          rm -rf ${{ github.event.inputs.arch }}/\[Content_Types\].xml ${{ github.event.inputs.arch }}/AppxBlockMap.xml ${{ github.event.inputs.arch }}/AppxSignature.p7x ${{ github.event.inputs.arch }}/AppxMetadata
+          cp vclibs.appx xaml.appx ${{ github.event.inputs.arch }}
+          tee ${{ github.event.inputs.arch }}/Install.ps1 <<EOF
           # Automated Install script by Mioki
           # http://github.com/okibcn
           function Test-Administrator {
@@ -516,9 +517,9 @@ jobs:
           else
             name2="-GApps-${variant}"
           fi
-          echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
+          echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ github.event.inputs.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
       - name: Upload WSA
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.artifact_name }}
-          path: "./${{ matrix.arch }}/*"
+          path: "./${{ github.event.inputs.arch }}/*"

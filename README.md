@@ -1,4 +1,4 @@
-# Magisk on WSA (with Google Apps)
+# Magisk on WSA (with Google Apps) + Netfree and netspark CAs
 
 ## Features
 - Netfree and netspark security certificates are integrated in the system no ROOT nedded!

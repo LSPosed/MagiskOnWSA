@@ -326,7 +326,7 @@ jobs:
           sudo chmod -R 700 userdata/adb
           sudo cp magisk/* userdata/adb/magisk/
           sudo find userdata/adb/magisk -type f -exec chmod 0755 {} \;
-          sudo cp magisk.zip userdata/adb/magisk/magisk.apk
+          sudo cp magisk-alpha.zip userdata/adb/magisk/magisk-alpha.apk
           sudo tee -a system/sbin/loadpolicy.sh <<EOF
           #!/system/bin/sh
           restorecon -R /data/adb/magisk

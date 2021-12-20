@@ -108,6 +108,7 @@ jobs:
 
           print("done", flush=True)
       - name: Download Magisk
+        if: ${{ github.event.inputs.root_sol == 'magisk' && github.event.inputs.root_sol != '' }}
         shell: python
         run: |
           import urllib.request
@@ -144,6 +145,7 @@ jobs:
               extract_as(zip, f"assets/boot_patch.sh", "boot_patch.sh", "magisk")
               extract_as(zip, f"assets/util_functions.sh", "util_functions.sh", "magisk")
       - name: Download Magisk Alpha
+        if: ${{ github.event.inputs.root_sol == 'magisk-alpha' && github.event.inputs.root_sol != '' }}
         shell: python
         run: |
           import urllib.request

@@ -8,12 +8,16 @@ on:
         description: "Download link to magisk apk."
         required: true
         default: "https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk"
+      alpha_apk:
+        description: "Download link to magisk alpha apk."
+        required: true
+        default: "https://github.com/vvb2060/magisk_files/raw/alpha/app-release.apk"
       gapps_variant:
         description: "Variants of gapps. Should be: [none, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]"
         required: true
         default: "none"
       root_sol:
-        description: "Root soluction. Should be: [magisk, none]"
+        description: "Root soluction. Should be: [magisk, magisk-alpha, none]"
         required: true
         default: "magisk"
 
@@ -139,6 +143,42 @@ jobs:
               extract_as(zip, f"lib/{ abi_map['x64'][0] }/libmagiskinit.so", "magiskpolicy", ".")
               extract_as(zip, f"assets/boot_patch.sh", "boot_patch.sh", "magisk")
               extract_as(zip, f"assets/util_functions.sh", "util_functions.sh", "magisk")
+      - name: Download Magisk Alpha
+        shell: python
+        run: |
+          import urllib.request
+          import zipfile
+          import os
+
+          alpha_apk = """${{ github.event.inputs.alpha_apk }}"""
+
+          if not alpha_apk:
+              alpha_apk = """https://github.com/vvb2060/magisk_files/raw/alpha/app-release.apk"""
+
+          out_file = "magisk-alpha.zip"
+
+          arch = "${{ matrix.arch }}"
+
+          abi_map={"x64" : ["x86_64", "x86"], "arm64" : ["arm64-v8a", "armeabi-v7a"]}
+
+          if not os.path.isfile(out_file):
+              urllib.request.urlretrieve(alpha_apk, out_file)
+
+          def extract_as(zip, name, as_name, dir):
+              info = zip.getinfo(name)
+              info.filename = as_name
+              zip.extract(info, dir)
+
+          with zipfile.ZipFile(out_file) as zip:
+              extract_as(zip, f"lib/{ abi_map[arch][0] }/libmagisk64.so", "magisk64", "magisk")
+              extract_as(zip, f"lib/{ abi_map[arch][1] }/libmagisk32.so", "magisk32", "magisk")
+              extract_as(zip, f"lib/{ abi_map[arch][0] }/libmagiskinit.so", "magiskinit", "magisk")
+              extract_as(zip, f"lib/{ abi_map[arch][0] }/libmagiskinit.so", "magiskpolicy", "magisk")
+              extract_as(zip, f"lib/{ abi_map[arch][0] }/libmagiskboot.so", "magiskboot", "magisk")
+              extract_as(zip, f"lib/{ abi_map[arch][0] }/libbusybox.so", "busybox", "magisk")
+              extract_as(zip, f"lib/{ abi_map['x64'][0] }/libmagiskinit.so", "magiskpolicy", ".")
+              extract_as(zip, f"assets/boot_patch.sh", "boot_patch.sh", "magisk")
+              extract_as(zip, f"assets/util_functions.sh", "util_functions.sh", "magisk")
       - name: Download OpenGApps
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         shell: python
@@ -195,6 +235,85 @@ jobs:
           sudo mount -o loop userdata.img userdata
       - name: Integrate Magisk
         if: ${{ github.event.inputs.root_sol == 'magisk' || github.event.inputs.root_sol == '' }}
+        run: |
+          sudo mkdir system/sbin
+          sudo chcon --reference system/init.environ.rc system/sbin
+          sudo chown root:root system/sbin
+          sudo chmod 0700 system/sbin
+          sudo cp magisk/* system/sbin/
+          sudo mkdir -p userdata/adb/magisk
+          sudo chmod -R 700 userdata/adb
+          sudo cp magisk/* userdata/adb/magisk/
+          sudo find userdata/adb/magisk -type f -exec chmod 0755 {} \;
+          sudo cp magisk.zip userdata/adb/magisk/magisk.apk
+          sudo tee -a system/sbin/loadpolicy.sh <<EOF
+          #!/system/bin/sh
+          restorecon -R /data/adb/magisk
+          for module in \$(ls /data/adb/modules); do
+              if ! [ -f "/data/adb/modules/\$module/disable" ] && [ -f "/data/adb/modules/\$module/sepolicy.rule" ]; then
+                  /sbin/magiskpolicy --live --apply "/data/adb/modules/\$module/sepolicy.rule"
+              fi
+          done
+          EOF
+          sudo find system/sbin -type f -exec chmod 0755 {} \;
+          sudo find system/sbin -type f -exec chown root:root {} \;
+          sudo find system/sbin -type f -exec chcon --reference system/product {} \;
+          chmod +x ./magiskpolicy
+          echo '/dev/wsa-magisk(/.*)?    u:object_r:magisk_file:s0' | sudo tee -a system/vendor/etc/selinux/vendor_file_contexts
+          echo '/data/adb/magisk(/.*)?   u:object_r:magisk_file:s0' | sudo tee -a system/vendor/etc/selinux/vendor_file_contexts
+          sudo ./magiskpolicy --load system/vendor/etc/selinux/precompiled_sepolicy --save system/vendor/etc/selinux/precompiled_sepolicy --magisk "allow * magisk_file lnk_file *"
+          sudo tee -a system/system/etc/init/hw/init.rc <<EOF
+
+          on post-fs-data
+              start logd
+              start adbd
+              mkdir /dev/wsa-magisk
+              mount tmpfs tmpfs /dev/wsa-magisk mode=0755
+              copy /sbin/magisk64 /dev/wsa-magisk/magisk64
+              chmod 0755 /dev/wsa-magisk/magisk64
+              symlink ./magisk64 /dev/wsa-magisk/magisk
+              symlink ./magisk64 /dev/wsa-magisk/su
+              symlink ./magisk64 /dev/wsa-magisk/resetprop
+              copy /sbin/magisk32 /dev/wsa-magisk/magisk32
+              chmod 0755 /dev/wsa-magisk/magisk32
+              copy /sbin/magiskinit /dev/wsa-magisk/magiskinit
+              chmod 0755 /dev/wsa-magisk/magiskinit
+              symlink ./magiskinit /dev/wsa-magisk/magiskpolicy
+              mkdir /dev/wsa-magisk/.magisk 700
+              mkdir /dev/wsa-magisk/.magisk/mirror 700
+              mkdir /dev/wsa-magisk/.magisk/block 700
+              rm /dev/.magisk_unblock
+              start IhhslLhHYfse
+              start FAhW7H9G5sf
+              wait /dev/.magisk_unblock 40
+              rm /dev/.magisk_unblock
+
+          service IhhslLhHYfse /system/bin/sh /sbin/loadpolicy.sh
+              user root
+              seclabel u:r:magisk:s0
+              oneshot
+
+          service FAhW7H9G5sf /dev/wsa-magisk/magisk --post-fs-data
+              user root
+              seclabel u:r:magisk:s0
+              oneshot
+
+          service HLiFsR1HtIXVN6 /dev/wsa-magisk/magisk --service
+              class late_start
+              user root
+              seclabel u:r:magisk:s0
+              oneshot
+
+          on property:sys.boot_completed=1
+              start YqCTLTppv3ML
+
+          service YqCTLTppv3ML /dev/wsa-magisk/magisk --boot-complete
+              user root
+              seclabel u:r:magisk:s0
+              oneshot
+          EOF
+      - name: Integrate Magisk Alpha
+        if: ${{ github.event.inputs.root_sol == 'magisk-alpha' || github.event.inputs.root_sol == '' }}
         run: |
           sudo mkdir system/sbin
           sudo chcon --reference system/init.environ.rc system/sbin
@@ -506,7 +625,9 @@ jobs:
           root="${{ github.event.inputs.root_sol }}"
           if [[ "$root" = "none" ]]; then
             name1=""
-          elif [[ "$root" = "" ]]; then
+          elif [[ "$root" = "magisk-alpha" ]]; then
+            name1="-with-magisk-alpha"
+          elif [[ "$root" = "magisk" ]]; then
             name1="-with-magisk"
           else
             name1="-with-${root}"

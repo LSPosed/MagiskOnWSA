@@ -7,7 +7,7 @@
 - Support both ARM64 and x64
 - Support all OpenGApps variants except for aroma (aroma does not support x86_64, please use super instead)
 - Fix external storage access of DocumentUI
-- Unatended installation
+- Unattended installation
 - Automatically activates developers mode in Windows 11
 - Update to new version while preserving data with one-click script
 - Merged all language packs
@@ -60,13 +60,13 @@ https://user-images.githubusercontent.com/5022927/145696886-e13ebfc1-ff25-4410-8
     Like all the other emulators, no way.
 - Virtualization is not enabled?
 
-    `Install.ps1` helps you enable it if not enabled. After rebooting, rerun `Install.ps1` to install WSA. If it's still not working, you have to enable virualization in BIOS. That's a long story so ask Google for help.
+    `Install.ps1` helps you enable it if not enabled. After rebooting, rerun `Install.ps1` to install WSA. If it's still not working, you have to enable virtualization in BIOS. That's a long story so ask Google for help.
 - How to remount system as read-write?
 
     No way in WSA since it's mounted as read-only by Hyper-V. You can modify system by making a Magisk module. Or directly modify system.img. Ask Google for help.
 - I cannot `adb connect localhost:58526`
 
-    Make sure developer mode is enabled. If the issue persists, check the ip address of WSA in the setting page and try `adb connect ip:5555`.
+    Make sure developer mode is enabled. If the issue persists, check the IP address of WSA in the setting page and try `adb connect ip:5555`.
 - Magisk online module list is empty?
 
     Magisk actively remove online module repository. You can install module locally or by `adb push module.zip /data/local/tmp` and `adb shell su -c magisk --install-module /data/local/tmp/module.zip`.

@@ -148,6 +148,7 @@ jobs:
           import os
           import urllib.request
           import json
+          import re
 
           arch = "${{ matrix.arch }}"
           variant = "${{ github.event.inputs.gapps_variant }}"

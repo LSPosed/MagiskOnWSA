@@ -148,16 +148,19 @@ jobs:
           import os
           import urllib.request
           import json
+          import re
 
           arch = "${{ matrix.arch }}"
           variant = "${{ github.event.inputs.gapps_variant }}"
           abi_map = {"x64" : "x86_64", "arm64": "arm64"}
-
-          res = requests.get(f"https://api.opengapps.org/list")
-
-          j = json.loads(res.content)
-
-          link = {i["name"]: i for i in j["archs"][abi_map[arch]]["apis"]["11.0"]["variants"]}[variant]["zip"]
+          try:
+              res = requests.get(f"https://api.opengapps.org/list")
+              j = json.loads(res.content)
+              link = {i["name"]: i for i in j["archs"][abi_map[arch]]["apis"]["11.0"]["variants"]}[variant]["zip"]
+          except Exception:
+              print("Failed to fetch from opengapps api, fallbacking to sourceforge rss...")
+              res = requests.get(f'https://sourceforge.net/projects/opengapps/rss?path=/{abi_map[arch]}&limit=100')
+              link = re.search(f'https://.*{abi_map[arch]}/.*{variant}.*\.zip/download', res.text).group().replace('.zip/download', '.zip').replace('sourceforge.net/projects/opengapps/files', 'downloads.sourceforge.net/project/opengapps')
 
           print(f"downloading link: {link}", flush=True)
 

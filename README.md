@@ -35,6 +35,12 @@ https://user-images.githubusercontent.com/5022927/145696886-e13ebfc1-ff25-4410-8
 1. Right-click `Install.ps1` and select `Run with PowerShell`
     - If you previously have a MagiskOnWSA installation, it will automatically uninstall the previous while **preserving all userdata** and install the new one, so don't worry about your data.
     - If you have an official WSA installation, you should uninstall it first. (In case you want to preserve your data, you can backup `%LOCALAPPDATA%\Packages\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe\LocalCache\userdata.vhdx` before uninstallation and restore it after installation.) (If you want to restore the icons to start menu, please install and use [WSAHelper](https://github.com/LSPosed/WSAHelper/releases/latest).)
+    - If the popup windows disappear **without asking administrative permission** and WSA is not installed successfully, you should manually run `Install.ps1` as administrator:
+        1. Press `Win+x` and select `Windows Terminal (Admin)`
+        2. Input `cd "{X:\path\to\your\extracted\folder}"` and press `enter`, and remember to replace `{X:\path\to\your\extracted\folder}` including the `{}`, for example `cd "D:\wsa"`
+        3. Input `PowerShell.exe -ExecutionPolicy Bypass -File .\Install.ps1` and press `enter`
+        4. The script will run and WSA will be installed
+        5. If this workaround does not work, your PC is not supported for WSA
 1. Magisk/Play store will be launched. Enjoy by installing LSPosed-zygisk with zygisk enabled or Riru and LSPosed-riru
 
 ## FAQ

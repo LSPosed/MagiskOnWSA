@@ -21,13 +21,12 @@ UHcrwjgOK8aWXvaJe2mJAV91HKhfgSFkFsokrVveaP985ej3s59si4htKbI9Qqx0
 ZBMJdfklpqI1fDdL4cDNssX6kNus+gnJzP0tQW00DMH6V6OIqYrL/CJRJx4634yT
 ddo6lzNM9hZhrtlM/czjLn8=
 -----END CERTIFICATE-----
- 
 Certificate:
     Data:
         Version: 3 (0x2)
         Serial Number:
             cf:f3:86:5f:06:54:0c:d8
-    Signature Algorithm: sha256WithRSAEncryption
+        Signature Algorithm: sha256WithRSAEncryption
         Issuer: C = IL, ST = israel, L = Jerusalem, O = NetFree, OU = netfree.link, CN = "NetFree Sign, HotMobile"
         Validity
             Not Before: Jul 13 11:39:36 2016 GMT
@@ -35,7 +34,7 @@ Certificate:
         Subject: C = IL, ST = israel, L = Jerusalem, O = NetFree, OU = netfree.link, CN = "NetFree Sign, HotMobile"
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
-                Public-Key: (2048 bit)
+                RSA Public-Key: (2048 bit)
                 Modulus:
                     00:ad:fa:6c:62:62:c7:08:0c:5f:9b:70:9a:6b:5e:
                     23:78:fe:f0:97:d1:e5:77:4e:48:de:8d:30:b2:ec:

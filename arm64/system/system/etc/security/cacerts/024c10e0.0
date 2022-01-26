@@ -26,7 +26,7 @@ Certificate:
         Version: 3 (0x2)
         Serial Number:
             87:73:7f:ef:60:2e:68:b9
-    Signature Algorithm: sha256WithRSAEncryption
+        Signature Algorithm: sha256WithRSAEncryption
         Issuer: C = IL, ST = israel, L = Jerusalem, O = NetFree, OU = netfree.link, CN = "NetFree Sign, KosherSIM ITC"
         Validity
             Not Before: Apr 22 16:33:12 2018 GMT
@@ -34,7 +34,7 @@ Certificate:
         Subject: C = IL, ST = israel, L = Jerusalem, O = NetFree, OU = netfree.link, CN = "NetFree Sign, KosherSIM ITC"
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
-                Public-Key: (2048 bit)
+                RSA Public-Key: (2048 bit)
                 Modulus:
                     00:cf:e1:2e:17:6a:92:0e:bd:0b:f9:c1:66:df:07:
                     38:36:d9:f6:35:a5:6b:34:df:4c:cc:10:e0:95:be:

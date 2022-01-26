@@ -37,7 +37,7 @@ Certificate:
         Version: 3 (0x2)
         Serial Number:
             19:22:fa:89:9f:0a:cf:f0:93:dd:0d:64:89:8a:0a:2b:be:60:c5:fc
-    Signature Algorithm: sha256WithRSAEncryption
+        Signature Algorithm: sha256WithRSAEncryption
         Issuer: C = IL, ST = israel, L = Jerusalem, O = NetFree, OU = netfree.link, CN = "NetFree Sign, IB Partner"
         Validity
             Not Before: Apr 26 14:03:39 2020 GMT
@@ -45,7 +45,7 @@ Certificate:
         Subject: C = IL, ST = israel, L = Jerusalem, O = NetFree, OU = netfree.link, CN = "NetFree Sign, IB Partner"
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
-                Public-Key: (4096 bit)
+                RSA Public-Key: (4096 bit)
                 Modulus:
                     00:ad:8f:8b:ed:e7:94:c6:be:68:9d:0c:a5:63:92:
                     d4:f2:4c:70:ca:20:94:a1:ab:bd:91:11:a6:06:7d:

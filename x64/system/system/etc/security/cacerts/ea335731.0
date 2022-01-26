@@ -26,7 +26,7 @@ Certificate:
         Version: 3 (0x2)
         Serial Number:
             d2:63:57:71:ee:2e:55:6a
-    Signature Algorithm: sha256WithRSAEncryption
+        Signature Algorithm: sha256WithRSAEncryption
         Issuer: C = IL, ST = israel, L = jerusalem, O = NetFree, OU = netfree.613m.org, CN = "NetFree Sign ,RL ISP"
         Validity
             Not Before: Nov 15 23:16:54 2014 GMT
@@ -34,7 +34,7 @@ Certificate:
         Subject: C = IL, ST = israel, L = jerusalem, O = NetFree, OU = netfree.613m.org, CN = "NetFree Sign ,RL ISP"
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
-                Public-Key: (2048 bit)
+                RSA Public-Key: (2048 bit)
                 Modulus:
                     00:da:01:2f:e5:2d:18:24:56:2b:59:23:49:24:d8:
                     6d:05:13:7d:21:fc:85:86:1f:e5:34:2a:36:2b:c0:

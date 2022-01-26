@@ -26,7 +26,7 @@ Certificate:
         Version: 3 (0x2)
         Serial Number:
             dc:8e:c3:66:68:eb:b7:20
-    Signature Algorithm: sha256WithRSAEncryption
+        Signature Algorithm: sha256WithRSAEncryption
         Issuer: C = IL, ST = israel, L = Jerusalem, O = NetFree, OU = netfree.link, CN = "NetFree Sign, KSIM - Partner"
         Validity
             Not Before: Apr 26 08:20:59 2018 GMT
@@ -34,7 +34,7 @@ Certificate:
         Subject: C = IL, ST = israel, L = Jerusalem, O = NetFree, OU = netfree.link, CN = "NetFree Sign, KSIM - Partner"
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
-                Public-Key: (2048 bit)
+                RSA Public-Key: (2048 bit)
                 Modulus:
                     00:f1:cc:9e:d2:bd:60:39:96:46:bb:58:7a:0c:18:
                     2b:8c:17:3c:57:a0:3f:4c:b2:87:e5:0b:2b:61:36:

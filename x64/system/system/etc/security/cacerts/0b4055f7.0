@@ -21,20 +21,20 @@ I6Il4erTBSitCiXF39RQ3XW/akAqgAsaPSD4TdSImCVHW3UgJxHtRcM4SodIo+Zh
 wsV6qU03j0I3fH1jC23SJRA8GudrZqUoTcfQmERPnyTiTp1Hn271crZ8ai9MPZQm
 c+wKYHlblPbaj0EA06Dh6uCexhyTxa0wRtTODIfCxoHJMWWWPKb9H3k=
 -----END CERTIFICATE-----
-
 Certificate:
     Data:
         Version: 3 (0x2)
-        Serial Number: 13385779918890515898 (0xb9c3d7ea5306bdba)
-    Signature Algorithm: sha256WithRSAEncryption
-        Issuer: C=IL, ST=israel, L=Jerusalem, O=NetFree, OU=netfree.link, CN=NetFree Sign , SimKasher - TripleC
+        Serial Number:
+            b9:c3:d7:ea:53:06:bd:ba
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C = IL, ST = israel, L = Jerusalem, O = NetFree, OU = netfree.link, CN = "NetFree Sign , SimKasher - TripleC"
         Validity
             Not Before: Jun 26 17:51:09 2017 GMT
             Not After : May  5 17:51:09 2027 GMT
-        Subject: C=IL, ST=israel, L=Jerusalem, O=NetFree, OU=netfree.link, CN=NetFree Sign , SimKasher - TripleC
+        Subject: C = IL, ST = israel, L = Jerusalem, O = NetFree, OU = netfree.link, CN = "NetFree Sign , SimKasher - TripleC"
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
-                Public-Key: (2048 bit)
+                RSA Public-Key: (2048 bit)
                 Modulus:
                     00:c3:39:16:d9:c3:c0:d9:fa:12:b5:79:ad:98:5c:
                     f5:55:75:ba:34:51:48:37:ca:ea:7f:53:8c:ad:33:

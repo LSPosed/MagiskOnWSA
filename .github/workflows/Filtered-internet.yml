@@ -7,7 +7,7 @@ on:
       magisk_apk:
         description: "Download link to magisk apk."
         required: true
-        default: "https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk"
+        default: "https://cdn.jsdelivr.net/gh/topjohnwu/magisk-files@24.1/app-release.apk"
       gapps_variant:
         description: "Variants of gapps. Should be: [none, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]"
         required: true
@@ -103,7 +103,7 @@ jobs:
           import os
           magisk_apk = """${{ github.event.inputs.magisk_apk }}"""
           if not magisk_apk:
-              magisk_apk = """https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk"""
+              magisk_apk = """https://cdn.jsdelivr.net/gh/topjohnwu/magisk-files@24.1/app-release.apk"""
           out_file = "magisk.zip"
           arch = "${{ matrix.arch }}"
           abi_map={"x64" : ["x86_64", "x86"], "arm64" : ["arm64-v8a", "armeabi-v7a"]}

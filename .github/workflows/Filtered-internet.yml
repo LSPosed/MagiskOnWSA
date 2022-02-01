@@ -383,7 +383,7 @@ jobs:
               Start-Process "wsa://com.android.vending"
           }
           if (-not (Test-Administrator)) {
-              \$proc = Start-Process -PassThru -WindowStyle Hidden -Verb RunAs powershell.exe -Args "-executionpolicy bypass -command Set-Location \`"\$PSScriptRoot\`"; \`"\$PSCommandPath\`" EVAL"
+              \$proc = Start-Process -PassThru -WindowStyle Hidden -Verb RunAs powershell.exe -Args "-executionpolicy bypass -command Set-Location '\$PSScriptRoot'; &'\$PSCommandPath' EVAL"
               \$proc.WaitForExit()
               if (\$proc.ExitCode -ne 0) {
                   Clear-Host
@@ -393,7 +393,7 @@ jobs:
               exit
           }
           elseif ((\$args.Count -eq 1) -and (\$args[0] -eq "EVAL")) {
-              Start-Process powershell.exe -Args "-executionpolicy bypass -command Set-Location \`"\$PSScriptRoot\`"; \`"\$PSCommandPath\`""
+              Start-Process powershell.exe -Args "-executionpolicy bypass -command Set-Location '\$PSScriptRoot'; &'\$PSCommandPath'"
               exit
           }
           reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"

@@ -121,13 +121,13 @@ jobs:
               magisk_apk = magisk_file_json['magisk']['link']
               
           elif magisk_apk == "beta":
-              magisk_file = urlopen("https://raw.githubusercontent.com/topjohnwu/magisk-files/master/canary.json")
+              magisk_file = urlopen("https://raw.githubusercontent.com/topjohnwu/magisk-files/master/beta.json")
               magisk_file_read = magisk_file.read()
               magisk_file_json = json.loads(magisk_file_read)
               magisk_apk = magisk_file_json['magisk']['link']
               
           elif magisk_apk == "canary":
-              magisk_file = urlopen("https://raw.githubusercontent.com/topjohnwu/magisk-files/master/beta.json")
+              magisk_file = urlopen("https://raw.githubusercontent.com/topjohnwu/magisk-files/master/canary.json")
               magisk_file_read = magisk_file.read()
               magisk_file_json = json.loads(magisk_file_read)
               magisk_apk = magisk_file_json['magisk']['link']

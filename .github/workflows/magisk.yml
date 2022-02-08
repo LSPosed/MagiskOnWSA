@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
     inputs:
       magisk_apk:
-        description: "Download link to magisk apk."
+        description: "Download magisk apk. Should be: [stable, canary]"
         required: true
-        default: "https://cdn.jsdelivr.net/gh/topjohnwu/magisk-files@24.1/app-release.apk"
+        default: "stable"
       gapps_variant:
         description: "Variants of gapps. Should be: [none, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]"
         required: true
@@ -112,8 +112,10 @@ jobs:
 
           magisk_apk = """${{ github.event.inputs.magisk_apk }}"""
 
-          if not magisk_apk:
-              magisk_apk = """https://cdn.jsdelivr.net/gh/topjohnwu/magisk-files@24.1/app-release.apk"""
+          if not magisk_apk or magisk_apk == "stable":
+              magisk_apk = """https://cdn.jsdelivr.net/gh/topjohnwu/magisk-files@24.1/app-release.apk"""              
+          elif magisk_apk == "canary":
+              magisk_apk = """https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk"""
 
           out_file = "magisk.zip"
 

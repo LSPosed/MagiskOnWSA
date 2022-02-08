@@ -107,10 +107,10 @@ jobs:
         shell: python
         run: |
           import urllib.request
-          import requests
           import zipfile
           import os
           import json
+          from urllib.request import urlopen
 
           magisk_apk = """${{ github.event.inputs.magisk_apk }}"""
                     

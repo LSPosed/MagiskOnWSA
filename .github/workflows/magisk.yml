@@ -116,10 +116,7 @@ jobs:
           if not magisk_apk:
               magisk_apk = "stable"
           if magisk_apk == "stable" or magisk_apk == "beta" or magisk_apk == "canary":
-              magisk_file = urllib.request.urlopen(f"https://raw.githubusercontent.com/topjohnwu/magisk-files/master/{magisk_apk}.json")
-              magisk_file_read = magisk_file.read()
-              magisk_file_json = json.loads(magisk_file_read)
-              magisk_apk = magisk_file_json['magisk']['link']
+              magisk_apk = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/{magisk_apk}.json").content)['magisk']['link']
 
           out_file = "magisk.zip"
 

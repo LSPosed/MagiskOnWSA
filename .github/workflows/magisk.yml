@@ -107,6 +107,7 @@ jobs:
         shell: python
         run: |
           import urllib.request
+          import requests
           import zipfile
           import os
           import json

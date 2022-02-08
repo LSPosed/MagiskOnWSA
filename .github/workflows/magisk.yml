@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       magisk_apk:
-        description: "Download magisk apk. Should be: [stable, canary]"
+        description: "Magisk version. Should be stable, canary or a download link to Magisk apk."
         required: true
         default: "stable"
       gapps_variant:

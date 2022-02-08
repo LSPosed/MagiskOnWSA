@@ -110,6 +110,7 @@ jobs:
           import zipfile
           import os
           import json
+          import requests
 
           magisk_apk = """${{ github.event.inputs.magisk_apk }}"""
 

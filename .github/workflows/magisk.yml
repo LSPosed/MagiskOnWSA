@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       magisk_apk:
-        description: "Magisk version. Should be stable, canary or a download link to Magisk apk."
+        description: "Magisk version. Should be stable, beta, canary or a download link to Magisk apk."
         required: true
         default: "stable"
       gapps_variant:
@@ -107,21 +107,29 @@ jobs:
         shell: python
         run: |
           import urllib.request
-          import requests
           import zipfile
           import os
+          import json
 
           magisk_apk = """${{ github.event.inputs.magisk_apk }}"""
-          
-          GetLatestlink = requests.get('https://github.com/topjohnwu/Magisk/releases/latest') 
-          Latestlink = GetLatestlink.url
-          ii = Latestlink.rfind('/v')
-          Latestv = Latestlink[ii+2:]
-
+                    
           if not magisk_apk or magisk_apk == "stable":
-              magisk_apk = """https://cdn.jsdelivr.net/gh/topjohnwu/magisk-files@""" + Latestv + """/app-release.apk"""              
+              magisk_file = urlopen("https://raw.githubusercontent.com/topjohnwu/magisk-files/master/stable.json")
+              magisk_file_read = magisk_file.read()
+              magisk_file_json = json.loads(magisk_file_read)
+              magisk_apk = magisk_file_json['magisk']['link']
+              
+          elif magisk_apk == "beta":
+              magisk_file = urlopen("https://raw.githubusercontent.com/topjohnwu/magisk-files/master/canary.json")
+              magisk_file_read = magisk_file.read()
+              magisk_file_json = json.loads(magisk_file_read)
+              magisk_apk = magisk_file_json['magisk']['link']
+              
           elif magisk_apk == "canary":
-              magisk_apk = """https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk"""
+              magisk_file = urlopen("https://raw.githubusercontent.com/topjohnwu/magisk-files/master/beta.json")
+              magisk_file_read = magisk_file.read()
+              magisk_file_json = json.loads(magisk_file_read)
+              magisk_apk = magisk_file_json['magisk']['link']
 
           out_file = "magisk.zip"
 

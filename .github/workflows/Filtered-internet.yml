@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
     inputs:
       magisk_apk:
-        description: "Download link to magisk apk."
+        description: "Magisk version. Should be stable, beta, canary or a download link to Magisk apk."
         required: true
-        default: "https://cdn.jsdelivr.net/gh/topjohnwu/magisk-files@24.1/app-release.apk"
+        default: "stable"
       gapps_variant:
         description: "Variants of gapps. Should be: [none, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]"
         required: true
@@ -39,29 +39,35 @@ jobs:
           import zipfile
           import os
           import urllib.request
+
           arch = "${{ matrix.arch }}"
+
           res = requests.post("https://store.rg-adguard.net/api/GetFiles", "type=CategoryId&url=858014f3-3934-4abe-8078-4aa193e74ca8&ring=WIS&lang=en-US", headers={
               "content-type": "application/x-www-form-urlencoded"
           })
           html = BeautifulSoup(res.content, "lxml")
+
           a = html.find("a", string=re.compile(f"Microsoft\.UI\.Xaml\..*_{arch}_.*\.appx"))
           link = a["href"]
           print(f"downloading link: {link}", flush=True)
           out_file = "xaml.appx"
           if not os.path.isfile(out_file):
               urllib.request.urlretrieve(link, out_file)
+
           a = html.find("a", string=re.compile(f"Microsoft\.VCLibs\..*_{arch}_.*\.appx"))
           link = a["href"]
           print(f"downloading link: {link}", flush=True)
           out_file = "vclibs.appx"
           if not os.path.isfile(out_file):
               urllib.request.urlretrieve(link, out_file)
+
           a = html.find("a", string=re.compile("MicrosoftCorporationII\.WindowsSubsystemForAndroid_.*\.msixbundle"))
           link = a["href"]
           print(f"downloading link: {link}", flush=True)
           out_file = "wsa.zip"
           if not os.path.isfile(out_file):
               urllib.request.urlretrieve(link, out_file)
+
           zip_name = ""
           with zipfile.ZipFile(out_file) as zip:
               for f in zip.filelist:
@@ -90,10 +96,12 @@ jobs:
                               elif g.filename == 'AppxManifest.xml':
                                   g.filename = f'{name}.xml'
                                   l.extract(g, 'xml')
+
           with zipfile.ZipFile(zip_name) as zip:
               if not os.path.isdir(arch):
                   print(f"unzipping from {zip_name}", flush=True)
                   zip.extractall(arch)
+
           print("done", flush=True)
       - name: Download Magisk
         shell: python
@@ -101,18 +109,30 @@ jobs:
           import urllib.request
           import zipfile
           import os
+          import json
+          import requests
+
           magisk_apk = """${{ github.event.inputs.magisk_apk }}"""
+
           if not magisk_apk:
-              magisk_apk = """https://cdn.jsdelivr.net/gh/topjohnwu/magisk-files@24.1/app-release.apk"""
+              magisk_apk = "stable"
+          if magisk_apk == "stable" or magisk_apk == "beta" or magisk_apk == "canary":
+              magisk_apk = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/{magisk_apk}.json").content)['magisk']['link']
+
           out_file = "magisk.zip"
+
           arch = "${{ matrix.arch }}"
+
           abi_map={"x64" : ["x86_64", "x86"], "arm64" : ["arm64-v8a", "armeabi-v7a"]}
+
           if not os.path.isfile(out_file):
               urllib.request.urlretrieve(magisk_apk, out_file)
+
           def extract_as(zip, name, as_name, dir):
               info = zip.getinfo(name)
               info.filename = as_name
               zip.extract(info, dir)
+
           with zipfile.ZipFile(out_file) as zip:
               extract_as(zip, f"lib/{ abi_map[arch][0] }/libmagisk64.so", "magisk64", "magisk")
               extract_as(zip, f"lib/{ abi_map[arch][1] }/libmagisk32.so", "magisk32", "magisk")
@@ -132,22 +152,34 @@ jobs:
           import os
           import urllib.request
           import json
+          import re
+
           arch = "${{ matrix.arch }}"
           variant = "${{ github.event.inputs.gapps_variant }}"
           abi_map = {"x64" : "x86_64", "arm64": "arm64"}
-          res = requests.get(f"https://api.opengapps.org/list")
-          j = json.loads(res.content)
-          link = {i["name"]: i for i in j["archs"][abi_map[arch]]["apis"]["11.0"]["variants"]}[variant]["zip"]
+          try:
+              res = requests.get(f"https://api.opengapps.org/list")
+              j = json.loads(res.content)
+              link = {i["name"]: i for i in j["archs"][abi_map[arch]]["apis"]["11.0"]["variants"]}[variant]["zip"]
+          except Exception:
+              print("Failed to fetch from opengapps api, fallbacking to sourceforge rss...")
+              res = requests.get(f'https://sourceforge.net/projects/opengapps/rss?path=/{abi_map[arch]}&limit=100')
+              link = re.search(f'https://.*{abi_map[arch]}/.*{variant}.*\.zip/download', res.text).group().replace('.zip/download', '.zip').replace('sourceforge.net/projects/opengapps/files', 'downloads.sourceforge.net/project/opengapps')
+
           print(f"downloading link: {link}", flush=True)
+
           out_file = "gapps.zip"
+
           if not os.path.isfile(out_file):
               urllib.request.urlretrieve(link, out_file)
           print("done", flush=True)
+
       - name: Extract GApps and expand images
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         run: |
           mkdir gapps
           unzip -p gapps.zip {Core,GApps}/'*.lz' | tar --lzip -C gapps -xvf - -i --strip-components=2 --exclude='setupwizardtablet-x86_64' --exclude='packageinstallergoogle-all' --exclude='speech-common' --exclude='markup-lib-arm' --exclude='markup-lib-arm64' --exclude='markup-all' --exclude='setupwizarddefault-x86_64' --exclude='pixellauncher-all' --exclude='pixellauncher-common'
+
           e2fsck -yf ${{ matrix.arch }}/system.img
           resize2fs ${{ matrix.arch }}/system.img $(( $(du -sB512 gapps | cut -f1) + $(du -sB512 ${{ matrix.arch }}/system.img | cut -f1) ))s
           e2fsck -yf ${{ matrix.arch }}/product.img
@@ -198,6 +230,7 @@ jobs:
           echo '/data/adb/magisk(/.*)?   u:object_r:magisk_file:s0' | sudo tee -a system/vendor/etc/selinux/vendor_file_contexts
           sudo ./magiskpolicy --load system/vendor/etc/selinux/precompiled_sepolicy --save system/vendor/etc/selinux/precompiled_sepolicy --magisk "allow * magisk_file lnk_file *"
           sudo tee -a system/system/etc/init/hw/init.rc <<EOF
+
           on post-fs-data
               start logd
               start adbd
@@ -221,21 +254,26 @@ jobs:
               start FAhW7H9G5sf
               wait /dev/.magisk_unblock 40
               rm /dev/.magisk_unblock
+
           service IhhslLhHYfse /system/bin/sh /sbin/loadpolicy.sh
               user root
               seclabel u:r:magisk:s0
               oneshot
+
           service FAhW7H9G5sf /dev/wsa-magisk/magisk --post-fs-data
               user root
               seclabel u:r:magisk:s0
               oneshot
+
           service HLiFsR1HtIXVN6 /dev/wsa-magisk/magisk --service
               class late_start
               user root
               seclabel u:r:magisk:s0
               oneshot
+
           on property:sys.boot_completed=1
               start YqCTLTppv3ML
+
           service YqCTLTppv3ML /dev/wsa-magisk/magisk --boot-complete
               user root
               seclabel u:r:magisk:s0
@@ -273,16 +311,21 @@ jobs:
           shopt -s extglob
           sudo cp -vr gapps/!(product) system/system
           sudo cp -vr gapps/product/* system/product/
+
           sudo find system/system/{app,etc,framework,priv-app} -exec chown root:root {} \;
           sudo find system/product/{app,etc,overlay,priv-app} -exec chown root:root {} \;
+
           sudo find system/system/{app,etc,framework,priv-app} -type d -exec chmod 0755 {} \;
           sudo find system/product/{app,etc,overlay,priv-app} -type d -exec chmod 0755 {} \;
+          
           sudo find system/system/{app,framework,priv-app} -type f -exec chmod 0644 {} \;
           ls gapps/etc/ | xargs -n 1 -I dir sudo find system/system/etc/dir -type f -exec chmod 0644 {} \;
           sudo find system/product/{app,etc,overlay,priv-app} -type f -exec chmod 0644 {} \;
+          
           sudo find system/system/{app,framework,priv-app} -type d -exec chcon --reference=system/system/app {} \;
           sudo find system/product/{app,etc,overlay,priv-app} -type d -exec chcon --reference=system/product/app {} \;
           ls gapps/etc/ | xargs -n 1 -I dir sudo find system/system/etc/dir -type d -exec chcon --reference=system/system/etc/permissions {} \;
+          
           sudo find system/system/{app,framework,priv-app} -type f -exec chcon --reference=system/system/framework/ext.jar {} \;
           ls gapps/etc/ | xargs -n 1 -I dir sudo find system/system/etc/dir -type f -exec chcon --reference=system/system/etc/permissions {} \;
           sudo find system/product/{app,etc,overlay,priv-app} -type f -exec chcon --reference=system/product/etc/permissions/privapp-permissions-venezia.xml {} \;
@@ -296,6 +339,8 @@ jobs:
           from io import TextIOWrapper
           from os import system
           from typing import OrderedDict
+          
+          
           class Prop(OrderedDict):
               def __init__(self, file: TextIOWrapper) -> None:
                   super().__init__()
@@ -305,11 +350,15 @@ jobs:
                           self[k] = v
                       else:
                           self[f".{i}"] = line
+          
               def __str__(self) -> str:
                   return '\n'.join([v if k.startswith('.') else f"{k}={v}" for k, v in self.items()])
+          
               def __iadd__(self, other: str) -> Prop:
                   self[f".{len(self)}"] = other
                   return self
+          
+          
           new_props = {
               ("product", "brand"): "google",
               ("product", "manufacturer"): "Google",
@@ -319,15 +368,23 @@ jobs:
               ("product", "model"): "Pixel 5",
               ("build", "flavor"): "redfin-user"
           }
+          
+          
           def description(sec: str, p: Prop) -> str:
               return f"{p[f'ro.{sec}.build.flavor']} {p[f'ro.{sec}.build.version.release_or_codename']} {p[f'ro.{sec}.build.id']} {p[f'ro.{sec}.build.version.incremental']} {p[f'ro.{sec}.build.tags']}"
+          
+          
           def fingerprint(sec: str, p: Prop) -> str:
               return f"""{p[f"ro.product.{sec}.brand"]}/{p[f"ro.product.{sec}.name"]}/{p[f"ro.product.{sec}.device"]}:{p[f"ro.{sec}.build.version.release"]}/{p[f"ro.{sec}.build.id"]}/{p[f"ro.{sec}.build.version.incremental"]}:{p[f"ro.{sec}.build.type"]}/{p[f"ro.{sec}.build.tags"]}"""
+          
+          
           def fix_prop(sec, prop):
               print(f"fixing {prop}", flush=True)
               with open(prop, 'r') as f:
                   p = Prop(f)
+          
               p += "# extra prop added by MagiskOnWSA"
+          
               for k, v in new_props.items():
                   p[f"ro.{k[0]}.{k[1]}"] = v
                   
@@ -335,13 +392,16 @@ jobs:
                       p[f"ro.{sec}.{k[0]}.{k[1]}"] = v
                   elif k[0] == "product":
                       p[f"ro.{k[0]}.{sec}.{k[1]}"] = v
+          
               p["ro.build.description"] = description(sec, p)
               p[f"ro.build.fingerprint"] = fingerprint(sec, p)
               p[f"ro.{sec}.build.description"] = description(sec, p)
               p[f"ro.{sec}.build.fingerprint"] = fingerprint(sec, p)
               p[f"ro.bootimage.build.fingerprint"] = fingerprint(sec, p)
+          
               with open(prop, 'w') as f:
                   f.write(str(p))
+          
           for sec, prop in {"system": "system/system/build.prop", "product": "system/product/build.prop", "system_ext": "system/system_ext/build.prop", "vendor": "system/vendor/build.prop", "odm": "system/vendor/odm/etc/build.prop"}.items():
               fix_prop(sec, prop)
       - name: Umount images
@@ -377,11 +437,13 @@ jobs:
                   return \$user.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator);
               }
           }
+          
           function Finish {
               Clear-Host
               Start-Process "wsa://com.topjohnwu.magisk"
               Start-Process "wsa://com.android.vending"
           }
+          
           if (-not (Test-Administrator)) {
               \$proc = Start-Process -PassThru -WindowStyle Hidden -Verb RunAs powershell.exe -Args "-executionpolicy bypass -command Set-Location '\$PSScriptRoot'; &'\$PSCommandPath' EVAL"
               \$proc.WaitForExit()
@@ -396,7 +458,9 @@ jobs:
               Start-Process powershell.exe -Args "-executionpolicy bypass -command Set-Location '\$PSScriptRoot'; &'\$PSCommandPath'"
               exit
           }
+          
           reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
+          
           \$VMP = Get-WindowsOptionalFeature -Online -FeatureName 'VirtualMachinePlatform'
           if (\$VMP.State -ne "Enabled") {
               Enable-WindowsOptionalFeature -Online -NoRestart -FeatureName 'VirtualMachinePlatform'
@@ -410,10 +474,13 @@ jobs:
                   exit 1
               }
           }
+          
           Add-AppxPackage -ForceApplicationShutdown -ForceUpdateFromAnyVersion -Path vclibs.appx
           Add-AppxPackage -ForceApplicationShutdown -ForceUpdateFromAnyVersion -Path xaml.appx
+          
           \$Installed = \$null
           \$Installed = Get-AppxPackage -Name 'MicrosoftCorporationII.WindowsSubsystemForAndroid'
+          
           If ((\$null -ne \$Installed) -and (-not (\$Installed.IsDevelopmentMode))) {
               Clear-Host
               Write-Warning "There is already one installed WSA. Please uninstall it first.\`r\`nPress y to uninstall existing WSA or press any key to exit"

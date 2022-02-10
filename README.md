@@ -81,7 +81,7 @@ https://user-images.githubusercontent.com/5022927/145696886-e13ebfc1-ff25-4410-8
     No. Magisk has bugs preventing itself running on WSA. Magisk Canary has fixed them. So try Magisk 23 canary or higher version.
 - But Magisk has removed hide since 23 canary?
 
-    Use [Magisk Alpha](https://t.me/magiskalpha) or use Zygisk with [Shamiko](https://t.me/c/1414270883/25744) for hidding. To intergrate Magisk Alpha, use this Magisk apk link https://github.com/vvb2060/magisk_files/raw/alpha/app-release.apk for the Github Action.
+    Use [Magisk Alpha](https://t.me/magiskalpha) or use Zygisk with [Shamiko](https://github.com/LSPosed/LSPosed.github.io/releases) for hiding. To intergrate Magisk Alpha, use this Magisk apk link https://github.com/vvb2060/magisk_files/raw/alpha/app-release.apk for the Github Action.
 - How can I get rid of Magisk?
 
     Input `none` as root solution.

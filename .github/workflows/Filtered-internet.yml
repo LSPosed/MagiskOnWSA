@@ -5,17 +5,38 @@ on:
   workflow_dispatch:
     inputs:
       magisk_apk:
-        description: "Magisk version. Should be stable, beta, canary or a download link to Magisk apk."
+        description: "Magisk version"
         required: true
         default: "stable"
+        type: choice
+        options:
+        - stable
+        - beta
+        - canary
       gapps_variant:
-        description: "Variants of gapps. Should be: [none, super, stock, full, mini, micro, nano, pico, tvstock, tvmini]"
+        description: "Variants of gapps"
         required: true
-        default: "pico"
+        default: "none"
+        type: choice
+        options:
+        - none
+        - super
+        - stock
+        - full
+        - mini
+        - micro
+        - nano
+        - pico
+        - tvstock
+        - tvmini
       root_sol:
-        description: "Root solution. Should be: [magisk, none]"
+        description: "Root solution"
         required: true
         default: "magisk"
+        type: choice
+        options:
+        - magisk
+        - none
 
 jobs:
   build:

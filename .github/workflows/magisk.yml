@@ -4,6 +4,15 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
+      arch:
+        description: "Build arch"
+        required: true
+        default: "x64 & arm64"
+        type: choice
+        options:
+        - x64
+        - arm64
+        - x64 & arm64
       magisk_apk:
         description: "Magisk version"
         required: true
@@ -39,11 +48,36 @@ on:
         - none
 
 jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Generate build matrix
+        id: set-matrix
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let matrix = {};
+            let arch = "${{ github.event.inputs.arch }}"
+            switch ( arch ) {
+              case "x64":
+                matrix.arch = ["x64"];
+                break;
+              case "arm64":
+                matrix.arch = ["arm64"];
+                break;
+              default:
+                matrix.arch = ["x64", "arm64"];
+                break;
+            }
+            core.setOutput("matrix",JSON.stringify(matrix));
+
   build:
     runs-on: ubuntu-20.04
+    needs: matrix
     strategy:
-      matrix:
-        arch: [x64, arm64]
+      matrix: ${{fromJson(needs.matrix.outputs.matrix)}}
     steps:
       - name: Dependencies
         run: |

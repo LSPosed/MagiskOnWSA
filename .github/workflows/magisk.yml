@@ -549,7 +549,7 @@ jobs:
           }
           Clear-Host
           Write-Host "Installing MagiskOnWSA..."
-          Stop-Process -Name "wsaclient"
+          Stop-Process -Name "wsaclient" -ErrorAction "silentlycontinue"
           Add-AppxPackage -ForceApplicationShutdown -ForceUpdateFromAnyVersion -Register .\AppxManifest.xml
           if (\$?) {
               Finish

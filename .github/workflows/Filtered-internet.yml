@@ -1,4 +1,4 @@
-name: Filtered-internet
+name: Filtered internet
 on:
   push:
     paths-ignore:
@@ -540,11 +540,7 @@ jobs:
               exit
           }
 
-        if (((Test-Path -Path $(ls -Q ./${{ matrix.arch }} | paste -sd "," -)) -eq \$false).Count) {
-              Write-Error "Some files are missing in the zip. Please try to download it again from the browser downloader, or try to run the workflow again. Press any key to exist"
-              \$null = \$Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
-              exit 1
-          }
+
             
           reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
           

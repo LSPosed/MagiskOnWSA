@@ -28,7 +28,7 @@ https://user-images.githubusercontent.com/5022927/145696886-e13ebfc1-ff25-4410-8
     ![Run Workflow](https://docs.github.com/assets/images/actions-workflow-dispatch.png)
 1. Input the download link of Magisk and select the [OpenGApps variant](https://github.com/opengapps/opengapps/wiki#variants) (none is no OpenGApps) you like, select the root solution (none means no root) and click **Run workflow**
     ![Run Workflow](https://docs.github.com/assets/images/actions-manually-run-workflow.png)
-1. Wait for the action to complete and download the artifact
+1. Wait for the action to complete and download the artifact **DO NOT download it via multithread downloaders like IDM or ADM**
     ![Download](https://docs.github.com/assets/images/help/repository/artifact-drop-down-updated.png)
 1. Unzip the artifact
     - The size shown in the webpage is uncompressed size and the zip you download will be compressed. So the size of the zip will be much less than the size shown in the webpage.

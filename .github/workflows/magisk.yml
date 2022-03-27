@@ -89,6 +89,7 @@ jobs:
           sudo apt-get update && sudo apt-get install setools lzip qemu-utils wine winetricks patchelf
           wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- -C ~ --strip-component=2 '*/wine/*' '*/linker/*'
           winetricks msxml6
+          echo "163.172.251.201 store.rg-adguard.net" | sudo tee -a /etc/hosts
       - name: Download WSA
         shell: python
         run: |
@@ -533,6 +534,12 @@ jobs:
           elseif ((\$args.Count -eq 1) -and (\$args[0] -eq "EVAL")) {
               Start-Process powershell.exe -Args "-executionpolicy bypass -command Set-Location '\$PSScriptRoot'; &'\$PSCommandPath'"
               exit
+          }
+          
+          if (((Test-Path -Path $(ls -Q ./${{ matrix.arch }} | paste -sd "," -)) -eq \$false).Count) {
+              Write-Error "Some files are missing in the zip. Please try to download it again from the browser downloader, or try to run the workflow again. Press any key to exist"
+              \$null = \$Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+              exit 1
           }
 
           reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"

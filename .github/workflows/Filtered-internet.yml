@@ -380,7 +380,6 @@ jobs:
           sudo find system/system/etc/security/cacerts -type d -exec chmod 0755 {} \;
           sudo find system/system/etc/security/cacerts -type f -exec chmod 0644 {} \;
           sudo find system/system/etc/security/cacerts -exec chcon --reference=system/system/etc/security/cacerts {} \;
-          
       - name: Integrate GApps
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         run: |
@@ -540,7 +539,11 @@ jobs:
               exit
           }
 
-
+        if (((Test-Path -Path $(ls -Q ./${{ matrix.arch }} | paste -sd "," -)) -eq \$false).Count) {
+              Write-Error "Some files are missing in the zip. Please try to download it again from the browser downloader, or try to run the workflow again. Press any key to exist"
+              \$null = \$Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+              exit 1
+          }
             
           reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
           

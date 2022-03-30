@@ -17,6 +17,14 @@ on:
         - x64
         - arm64
         - x64 & arm64
+      release_type:
+        description: "WSA Build type"
+        required: true
+        default: "retail"
+        type: choice
+        options:
+        - retail
+        - insider
       magisk_apk:
         description: "Magisk version"
         required: true
@@ -101,8 +109,9 @@ jobs:
           import urllib.request
 
           arch = "${{ matrix.arch }}"
+          build_type_map = {"retail": "Retail", "insider": "WIS"}
 
-          res = requests.post("https://store.rg-adguard.net/api/GetFiles", "type=CategoryId&url=858014f3-3934-4abe-8078-4aa193e74ca8&ring=WIS&lang=en-US", headers={
+          res = requests.post("https://store.rg-adguard.net/api/GetFiles", "type=CategoryId&url=858014f3-3934-4abe-8078-4aa193e74ca8&ring={ build_type_map[github.event.inputs.release_type] }&lang=en-US", headers={
               "content-type": "application/x-www-form-urlencoded"
           })
           html = BeautifulSoup(res.content, "lxml")

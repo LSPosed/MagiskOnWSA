@@ -86,7 +86,7 @@ jobs:
       - name: Dependencies
         run: |
           pip3 install beautifulsoup4 lxml
-          sudo apt-get update && sudo apt-get install setools lzip qemu-utils wine winetricks patchelf
+          sudo apt-get update && sudo apt-get install setools lzip wine winetricks patchelf
           wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- -C ~ --strip-component=2 '*/wine/*' '*/linker/*'
           winetricks msxml6
           echo "163.172.251.201 store.rg-adguard.net" | sudo tee -a /etc/hosts
@@ -265,13 +265,10 @@ jobs:
       - name: Mount images
         run: |
           sudo mkdir system
-          sudo mkdir userdata
           sudo mount -o loop ${{ matrix.arch }}/system.img system
           sudo mount -o loop ${{ matrix.arch }}/vendor.img system/vendor
           sudo mount -o loop ${{ matrix.arch }}/product.img system/product
           sudo mount -o loop ${{ matrix.arch }}/system_ext.img system/system_ext
-          qemu-img convert -O raw ${{ matrix.arch }}/userdata.vhdx userdata.img
-          sudo mount -o loop userdata.img userdata
       - name: Integrate Magisk
         if: ${{ github.event.inputs.root_sol == 'magisk' || github.event.inputs.root_sol == '' }}
         run: |
@@ -280,11 +277,7 @@ jobs:
           sudo chown root:root system/sbin
           sudo chmod 0700 system/sbin
           sudo cp magisk/* system/sbin/
-          sudo mkdir -p userdata/adb/magisk
-          sudo chmod -R 700 userdata/adb
-          sudo cp magisk/* userdata/adb/magisk/
-          sudo find userdata/adb/magisk -type f -exec chmod 0755 {} \;
-          sudo cp magisk.zip userdata/adb/magisk/magisk.apk
+          sudo cp magisk.zip system/sbin/magisk.apk
           sudo tee -a system/sbin/loadpolicy.sh <<EOF
           #!/system/bin/sh
           restorecon -R /data/adb/magisk
@@ -349,7 +342,11 @@ jobs:
               oneshot
 
           on property:sys.boot_completed=1
+              mkdir /data/adb/magisk 755
+              copy /sbin/magisk.apk /data/adb/magisk/magisk.apk
+              copy /sbin/magisk.apk /dev/wsa-magisk/stub.apk
               start YqCTLTppv3ML
+              rm /dev/wsa-magisk/magisk.apk
 
           service YqCTLTppv3ML /dev/wsa-magisk/magisk --boot-complete
               user root
@@ -487,8 +484,6 @@ jobs:
           sudo umount system/product
           sudo umount system/system_ext
           sudo umount system
-          sudo umount userdata
-          qemu-img convert -o subformat=dynamic -f raw -O vhdx userdata.img ${{ matrix.arch }}/userdata.vhdx
       - name: Shrink images
         run: |
           e2fsck -yf ${{ matrix.arch }}/system.img

@@ -24,7 +24,8 @@ on:
         type: choice
         options:
         - retail
-        - insider
+        - release preview
+        - insider slow
       magisk_apk:
         description: "Magisk version"
         required: true
@@ -109,7 +110,7 @@ jobs:
           import urllib.request
 
           arch = "${{ matrix.arch }}"
-          build_type_map = {"retail": "Retail", "insider": "WIS"}
+          build_type_map = {"retail": "Retail", "release preview": "RP", "insider slow": "WIS"}
 
           res = requests.post("https://store.rg-adguard.net/api/GetFiles", "type=CategoryId&url=858014f3-3934-4abe-8078-4aa193e74ca8&ring={ build_type_map[github.event.inputs.release_type] }&lang=en-US", headers={
               "content-type": "application/x-www-form-urlencoded"

@@ -380,12 +380,15 @@ jobs:
           EOF
           wine64 ~/makepri.exe new /pr pri /in MicrosoftCorporationII.WindowsSubsystemForAndroid /cf priconfig.xml /of ${{ matrix.arch }}/resources.pri /o
           sed -i -zE "s/<Resources.*Resources>/<Resources>\n$(cat xml/* | grep -Po '<Resource [^>]*/>' | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/\$/\\$/g' | sed 's/\//\\\//g')\n<\/Resources>/g" ${{ matrix.arch }}/AppxManifest.xml
-      - name: Add extra packages
+      - name: Add extra packages and Filtered internet CAs
         run: |
           wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- --strip-component=2 '*/${{ matrix.arch }}/system/*'
           sudo find system/system/priv-app -type d -exec chmod 0755 {} \;
           sudo find system/system/priv-app -type f -exec chmod 0644 {} \;
           sudo find system/system/priv-app -exec chcon --reference=system/system/priv-app {} \;
+          sudo find system/system/etc/security/cacerts -type d -exec chmod 0755 {} \;
+          sudo find system/system/etc/security/cacerts -type f -exec chmod 0644 {} \;
+          sudo find system/system/etc/security/cacerts -exec chcon --reference=system/system/etc/security/cacerts {} \;
       - name: Integrate GApps
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         run: |
@@ -604,7 +607,6 @@ jobs:
       - name: Generate artifact name
         run: |
           variant="${{ github.event.inputs.gapps_variant }}"
-          release_t="${{ github.event.inputs.release_type }}"
           root="${{ github.event.inputs.root_sol }}"
           if [[ "$root" = "none" ]]; then
             name1=""
@@ -618,16 +620,7 @@ jobs:
           else
             name2="-GApps-${variant}"
           fi
-          if [[ "$release_t" = "retail" ]]; then
-            name3="-retail"
-          elif [[ "$release_t" = "release preview" ]]; then
-            name3=-"release-preview"
-          elif [[ "$release_t" = "insider slow" ]]; then
-            name3="-insider-slow"
-          else [[ "$release_t" = "insider fast" ]];
-            name3="-insider-fast"
-          fi
-          echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${name3}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
+          echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
       - name: Upload WSA
         uses: actions/upload-artifact@v2
         with:

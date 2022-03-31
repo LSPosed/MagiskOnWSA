@@ -17,6 +17,16 @@ on:
         - x64
         - arm64
         - x64 & arm64
+      release_type:
+        description: "WSA release type"
+        required: true
+        default: "retail"
+        type: choice
+        options:
+        - retail
+        - release preview
+        - insider slow
+        - insider fast
       magisk_apk:
         description: "Magisk version"
         required: true
@@ -101,8 +111,10 @@ jobs:
           import urllib.request
 
           arch = "${{ matrix.arch }}"
+          release_type_map = {"retail": "Retail", "release preview": "RP", "insider slow": "WIS", "insider fast": "WIF"}
+          release_type = release_type_map["${{ github.event.inputs.release_type }}"] if "${{ github.event.inputs.release_type }}" != "" else "Retail"
 
-          res = requests.post("https://store.rg-adguard.net/api/GetFiles", "type=CategoryId&url=858014f3-3934-4abe-8078-4aa193e74ca8&ring=WIS&lang=en-US", headers={
+          res = requests.post("https://store.rg-adguard.net/api/GetFiles", f"type=CategoryId&url=858014f3-3934-4abe-8078-4aa193e74ca8&ring={release_type}&lang=en-US", headers={
               "content-type": "application/x-www-form-urlencoded"
           })
           html = BeautifulSoup(res.content, "lxml")

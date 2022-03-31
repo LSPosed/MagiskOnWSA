@@ -604,6 +604,7 @@ jobs:
       - name: Generate artifact name
         run: |
           variant="${{ github.event.inputs.gapps_variant }}"
+          release_t="${{ github.event.inputs.release_type }}"
           root="${{ github.event.inputs.root_sol }}"
           if [[ "$root" = "none" ]]; then
             name1=""
@@ -617,7 +618,16 @@ jobs:
           else
             name2="-GApps-${variant}"
           fi
-          echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
+          if [[ "$release_t" = "retail" ]]; then
+            name3="-retail"
+          elif [[ "$release_t" = "release preview" ]]; then
+            name3=-"release-preview"
+          elif [[ "$release_t" = "insider slow" ]]; then
+            name3="-insider-slow"
+          else [[ "$release_t" = "insider fast" ]];
+            name3="-insider-fast"
+          fi
+          echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${name3}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
       - name: Upload WSA
         uses: actions/upload-artifact@v2
         with:

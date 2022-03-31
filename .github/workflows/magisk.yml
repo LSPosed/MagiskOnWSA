@@ -605,15 +605,6 @@ jobs:
         run: |
           variant="${{ github.event.inputs.gapps_variant }}"
           release_t="${{ github.event.inputs.release_type }}"
-          if [[ "$release" = "retail" ]]; then
-            name3="-retail"
-          if [[ "$release" = "release preview" ]]; then
-            name3=-"release-preview"
-          if [[ "$release" = "insider slow" ]]; then
-            name3="-insider-slow"
-          if [[ "$release" = "insider fast" ]]; then
-            name3="-insider-fast"
-          fi
           root="${{ github.event.inputs.root_sol }}"
           if [[ "$root" = "none" ]]; then
             name1=""
@@ -626,6 +617,15 @@ jobs:
             name2="-NoGApps"
           else
             name2="-GApps-${variant}"
+          fi
+          if [[ "$release_t" = "retail" ]]; then
+            name3="-retail"
+          if [[ "$release_t" = "release preview" ]]; then
+            name3=-"release-preview"
+          if [[ "$release_t" = "insider slow" ]]; then
+            name3="-insider-slow"
+          if [[ "$release_t" = "insider fast" ]]; then
+            name3="-insider-fast"
           fi
           echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_REL }}_${name3}" >> $GITHUB_ENV
       - name: Upload WSA

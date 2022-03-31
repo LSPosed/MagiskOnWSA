@@ -17,7 +17,7 @@ on:
         - x64
         - arm64
         - x64 & arm64
-            release_type:
+      release_type:
         description: "WSA release type"
         required: true
         default: "retail"

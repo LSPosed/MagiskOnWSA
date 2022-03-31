@@ -622,7 +622,7 @@ jobs:
             name3="-retail"
           elif [[ "$release_t" = "release preview" ]]; then
             name3=-"release-preview"
-          else [[ "$release_t" = "insider slow" ]]; then
+          elif [[ "$release_t" = "insider slow" ]]; then
             name3="-insider-slow"
           else [[ "$release_t" = "insider fast" ]];
             name3="-insider-fast"

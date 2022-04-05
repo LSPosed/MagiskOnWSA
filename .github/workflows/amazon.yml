@@ -1,4 +1,4 @@
-name: Build WSA
+name: amazon
 on:
   push:
     paths-ignore:

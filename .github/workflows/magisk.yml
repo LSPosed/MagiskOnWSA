@@ -331,6 +331,7 @@ jobs:
               mkdir /dev/wsa-magisk/.magisk 700
               mkdir /dev/wsa-magisk/.magisk/mirror 700
               mkdir /dev/wsa-magisk/.magisk/block 700
+              copy /sbin/magisk.apk /dev/wsa-magisk/stub.apk
               rm /dev/.magisk_unblock
               start IhhslLhHYfse
               start FAhW7H9G5sf
@@ -356,9 +357,7 @@ jobs:
           on property:sys.boot_completed=1
               mkdir /data/adb/magisk 755
               copy /sbin/magisk.apk /data/adb/magisk/magisk.apk
-              copy /sbin/magisk.apk /dev/wsa-magisk/stub.apk
               start YqCTLTppv3ML
-              rm /dev/wsa-magisk/magisk.apk
 
           service YqCTLTppv3ML /dev/wsa-magisk/magisk --boot-complete
               user root

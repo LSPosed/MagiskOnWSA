@@ -292,6 +292,9 @@ jobs:
           sudo cp magisk.zip system/sbin/magisk.apk
           sudo tee -a system/sbin/loadpolicy.sh <<EOF
           #!/system/bin/sh
+          mkdir -p /data/adb/magisk
+          cp /sbin/* /data/adb/magisk/
+          chmod -R 755 /data/adb/magisk
           restorecon -R /data/adb/magisk
           for module in \$(ls /data/adb/modules); do
               if ! [ -f "/data/adb/modules/\$module/disable" ] && [ -f "/data/adb/modules/\$module/sepolicy.rule" ]; then

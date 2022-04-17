@@ -534,6 +534,7 @@ jobs:
           }
 
           if (-not (Test-Administrator)) {
+              Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force
               \$proc = Start-Process -PassThru -WindowStyle Hidden -Verb RunAs powershell.exe -Args "-executionpolicy bypass -command Set-Location '\$PSScriptRoot'; &'\$PSCommandPath' EVAL"
               \$proc.WaitForExit()
               if (\$proc.ExitCode -ne 0) {

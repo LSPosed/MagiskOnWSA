@@ -60,6 +60,11 @@ on:
         options:
         - magisk
         - none
+      upload_anonfiles:
+        description: "Upload to Anonfiles"
+        required: true
+        default: true
+        type: boolean
 
 jobs:
   matrix:
@@ -621,10 +626,11 @@ jobs:
             name2="-GApps-${variant}"
           fi
           echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
-      - name: Compress
-        run: 7z a pack.zip -r ./${{ matrix.arch }}/*
-      - name: Update Aonofiles
-        run: curl -F "file=@pack.zip" https://api.anonfiles.com/upload
+      - name: Upload Aonofiles
+        if: ${{ github.event.inputs.upload_anonfiles }}
+        run: |
+          7z a ${{ env.artifact_name }}.7z -r ./${{ matrix.arch }}/*
+          curl -F "file=@${{ env.artifact_name }}.7z" https://api.anonfiles.com/upload
       - name: Upload WSA
         uses: actions/upload-artifact@v2
         with:

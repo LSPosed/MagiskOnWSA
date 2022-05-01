@@ -630,8 +630,15 @@ jobs:
         if: ${{ github.event.inputs.upload_anonfiles }}
         run: |
           7z a ${{ env.artifact_name }}.7z -r ./${{ matrix.arch }}/*
-          curl -F "file=@${{ env.artifact_name }}.7z" https://api.anonfiles.com/upload
-      - name: Upload WSA
+          curl -F "file=@${{ env.artifact_name }}.7z" https://api.anonfiles.com/upload > ANONFILES_UPLOAD_RESPONSE
+          cat ANONFILES_UPLOAD_RESPONSE
+          cat ANONFILES_UPLOAD_RESPONSE | jq -r .data.file.url.full > ${{ env.artifact_name }}_anonfiles.txt
+      - name: Upload Aonofiles Link
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.artifact_name }}_anonfiles.txt
+          path: ${{ env.artifact_name }}_anonfiles.txt
+      - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.artifact_name }}

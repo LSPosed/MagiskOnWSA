@@ -116,7 +116,7 @@ jobs:
 
           res = requests.post("https://store.rg-adguard.net/api/GetFiles", f"type=CategoryId&url=858014f3-3934-4abe-8078-4aa193e74ca8&ring={release_type}&lang=en-US", headers={
               "content-type": "application/x-www-form-urlencoded"
-          })
+          }, verify=False) # source site has expired cert
           html = BeautifulSoup(res.content, "lxml")
 
           a = html.find("a", string=re.compile(f"Microsoft\.UI\.Xaml\..*_{arch}_.*\.appx"))

@@ -63,7 +63,7 @@ on:
 
 jobs:
   matrix:
-    runs-on: [self-hosted, ahmed] 
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:

@@ -20,7 +20,7 @@ on:
       release_type:
         description: "WSA release type"
         required: true
-        default: "retail"
+        default: "insider fast"
         type: choice
         options:
         - retail
@@ -30,7 +30,7 @@ on:
       magisk_apk:
         description: "Magisk version"
         required: true
-        default: "stable"
+        default: "beta"
         type: choice
         options:
         - stable
@@ -39,7 +39,7 @@ on:
       gapps_variant:
         description: "Variants of gapps"
         required: true
-        default: "none"
+        default: "pico"
         type: choice
         options:
         - none
@@ -63,7 +63,7 @@ on:
 
 jobs:
   matrix:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ahmed] 
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:

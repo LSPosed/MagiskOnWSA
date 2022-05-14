@@ -636,5 +636,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GIT }}
         with:
           file: "./${{ env.artifact_name }}.zip"
-          tags: true
+          tags: false
           draft: true

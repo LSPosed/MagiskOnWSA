@@ -629,7 +629,7 @@ jobs:
       - name: to release
         uses: xresloader/upload-to-github-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GIT }}
         with:
           file: "*.md"
           tags: true

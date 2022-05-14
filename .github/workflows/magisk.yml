@@ -629,7 +629,7 @@ jobs:
       - name: Compress
         uses: TonyBogdanov/zip@1.0
         with:
-          args: zip -qq -r "./${{ env.artifact_name }}.zip" "./${{ matrix.arch }}/*"
+          args: zip -qq -r "./${{ env.artifact_name }}.zip" "./${{ matrix.arch }}/"
       - name: to release
         uses: xresloader/upload-to-github-release@v1
         env:

@@ -638,3 +638,4 @@ jobs:
           file: "./${{ env.artifact_name }}.zip"
           tags: false
           draft: true
+          update_latest_release: true

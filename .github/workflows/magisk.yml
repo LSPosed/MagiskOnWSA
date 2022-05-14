@@ -629,12 +629,12 @@ jobs:
       - name: Compress
         uses: TonyBogdanov/zip@1.0
         with:
-          args: zip -qq -r ./wsarelease.zip "./${{ matrix.arch }}/*"
+          args: zip -qq -r f"./${{ env.artifact_name }}.zip" "./${{ matrix.arch }}/*"
       - name: to release
         uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GIT }}
         with:
-          file: "./wsarelease.zip"
+          file: f"./${{ env.artifact_name }}.zip"
           tags: true
           draft: true

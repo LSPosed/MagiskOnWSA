@@ -7,6 +7,7 @@
 - Support both ARM64 and x64
 - Support all OpenGApps variants except for aroma (aroma does not support x86_64, please use super instead)
 - Fix external storage access of DocumentUI
+- Fix VPN dialog not showing (use our [VpnDialogs app](https://github.com/LSPosed/VpnDialogs))
 - Unattended installation
 - Automatically activates developers mode in Windows 11
 - Update to new version while preserving data with one-click script

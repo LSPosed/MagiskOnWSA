@@ -629,5 +629,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.artifact_name }}
-          path: "./${{ matrix.arch }}/${{ env.artifact_name }}.7z"
+          path: "${{ env.artifact_name }}.7z"
           if-no-files-found: error

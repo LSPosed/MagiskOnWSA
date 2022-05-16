@@ -625,7 +625,7 @@ jobs:
             name2="-GApps-${variant}"
           fi
           echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
-          echo "release_tag=WSA${name1}${name2}" >> $GITHUB_ENV
+          echo "release_tag=WSA${{ env.WSA_VER }}" >> $GITHUB_ENV
       - name: Upload WSA
         uses: actions/upload-artifact@v2
         if: ${{ github.event.inputs.release != 'true' }}

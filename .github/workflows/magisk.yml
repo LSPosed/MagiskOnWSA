@@ -63,12 +63,8 @@ on:
       release:
         description: "Upload to release"
         required: true
-        default: "no"
-        type: choice
-        options:
-        - yes
-        - no
-
+        default: false
+        type: boolean
 jobs:
   matrix:
     runs-on: ubuntu-latest
@@ -631,17 +627,17 @@ jobs:
           echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
       - name: Upload WSA
         uses: actions/upload-artifact@v2
-        if: ${{ github.event.inputs.release != 'yes' }}
+        if: ${{ github.event.inputs.release != 'true' }}
         with:
           name: ${{ env.artifact_name }}
           path: "./${{ matrix.arch }}/*"
       - name: Prepare Release
-        if: ${{ github.event.inputs.release == 'yes' }}
+        if: ${{ github.event.inputs.release == 'true' }}
         run: |
           7z a -t7z -mx=9 ${{ env.artifact_name }}.7z "./${{ matrix.arch }}/*"
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: ${{ github.event.inputs.release == 'yes' }}
+        if: ${{ github.event.inputs.release == 'true' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ env.artifact_name }}

@@ -641,7 +641,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ env.artifact_name }}
-          tag_name: ${{ env.artifact_name }}
+          name: WSA_${{ env.WSA_VER }}_${{ env.WSA_REL }}
+          tag_name: WSA_${{ env.WSA_VER }}_${{ env.WSA_REL }}
           files: |
             ${{ env.artifact_name }}.7z
-

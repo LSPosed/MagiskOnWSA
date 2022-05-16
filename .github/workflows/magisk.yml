@@ -634,7 +634,7 @@ jobs:
       - name: Prepare Release
         if: ${{ github.event.inputs.release == 'true' }}
         run: |
-          7z a -t7z -bb3 -ms=on -md=32m -mx=9 ${{ env.artifact_name }}.7z "./${{ matrix.arch }}"
+          zip -qq -r ${{ env.artifact_name }}.zip "./${{ matrix.arch }}"
       - name: Release
         uses: softprops/action-gh-release@v1
         if: ${{ github.event.inputs.release == 'true' }}
@@ -644,5 +644,5 @@ jobs:
           name: WSA_${{ env.WSA_VER }}_${{ env.WSA_REL }}_test
           tag_name: ${{ github.ref }}
           files: |
-            ${{ env.artifact_name }}.7z
+            ${{ env.artifact_name }}.zip
 

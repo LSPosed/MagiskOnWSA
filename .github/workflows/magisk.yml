@@ -1,11 +1,5 @@
 name: Build WSA
 on:
-  push:
-    paths-ignore:
-      - 'README.md'
-  pull_request:
-    paths-ignore:
-      - 'README.md'
   workflow_dispatch:
     inputs:
       arch:
@@ -60,11 +54,7 @@ on:
         options:
         - magisk
         - none
-      release:
-        description: "Upload to release"
-        required: true
-        default: false
-        type: boolean
+
 jobs:
   matrix:
     runs-on: ubuntu-latest
@@ -100,7 +90,7 @@ jobs:
       - name: Dependencies
         run: |
           pip3 install beautifulsoup4 lxml
-          sudo apt-get update && sudo apt-get install setools lzip wine winetricks patchelf p7zip-full
+          sudo apt-get update && sudo apt-get install setools lzip wine winetricks patchelf
           wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- -C ~ --strip-component=2 '*/wine/*' '*/linker/*'
           winetricks msxml6
           echo "163.172.251.201 store.rg-adguard.net" | sudo tee -a /etc/hosts
@@ -630,21 +620,13 @@ jobs:
           echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
       - name: Upload WSA
         uses: actions/upload-artifact@v2
-        if: ${{ github.event.inputs.release != 'true' }}
         with:
           name: ${{ env.artifact_name }}
           path: "./${{ matrix.arch }}/*"
-      - name: Prepare Release
-        if: ${{ github.event.inputs.release == 'true' }}
-        run: |
-          7z a -t7z -bb3 -ms=on -md=32m -mx=9 ${{ env.artifact_name }}.7z "./${{ matrix.arch }}"
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: ${{ github.event.inputs.release == 'true' }}
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          body: ${{ env.artifact_name }}
-          tag_name: ${{ env.artifact_name }}
-          files: |
-            ${{ env.artifact_name }}.7z
-
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 0

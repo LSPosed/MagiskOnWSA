@@ -272,7 +272,7 @@ jobs:
       - name: Expand vendor
         run: |
           e2fsck -yf ${{ matrix.arch }}/vendor.img
-          resize2fs ${{ matrix.arch }}/vendor.img 320M
+          resize2fs ${{ matrix.arch }}/vendor.img 400M
       - name: Mount images
         run: |
           sudo mkdir system

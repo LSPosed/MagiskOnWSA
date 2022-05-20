@@ -424,7 +424,7 @@ jobs:
         run: |
           from __future__ import annotations
           from io import TextIOWrapper
-          from os import system
+          from os import system, path
           from typing import OrderedDict
 
 
@@ -466,6 +466,9 @@ jobs:
 
 
           def fix_prop(sec, prop):
+              if not path.exists(prop):
+                  return
+
               print(f"fixing {prop}", flush=True)
               with open(prop, 'r') as f:
                   p = Prop(f)

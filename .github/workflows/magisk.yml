@@ -164,6 +164,7 @@ jobs:
 
           print("done", flush=True)
       - name: Download Magisk
+        if: ${{ github.event.inputs.magisk_apk != 'none' }}
         shell: python
         run: |
           import urllib.request

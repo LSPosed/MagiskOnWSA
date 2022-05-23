@@ -19,20 +19,21 @@ on:
         options:
         - retail
         - release preview
-        - insider slow
-        - insider fast
+        - beta
+        - dev
       magisk_apk:
         description: "Magisk version"
         required: true
         default: "stable"
         type: choice
         options:
+        - none
         - stable
         - beta
         - canary
         - debug
       gapps_variant:
-        description: "Variants of gapps"
+        description: "Open GApps variant"
         required: true
         default: "none"
         type: choice
@@ -47,14 +48,6 @@ on:
         - pico
         - tvstock
         - tvmini
-      root_sol:
-        description: "Root solution"
-        required: true
-        default: "magisk"
-        type: choice
-        options:
-        - magisk
-        - none
 
 jobs:
   matrix:
@@ -106,7 +99,7 @@ jobs:
           import urllib.request
 
           arch = "${{ matrix.arch }}"
-          release_type_map = {"retail": "Retail", "release preview": "RP", "insider slow": "WIS", "insider fast": "WIF"}
+          release_type_map = {"retail": "Retail", "release preview": "RP", "beta": "WIS", "dev": "WIF"}
           release_type = release_type_map["${{ github.event.inputs.release_type }}"] if "${{ github.event.inputs.release_type }}" != "" else "Retail"
 
           res = requests.post("https://store.rg-adguard.net/api/GetFiles", f"type=CategoryId&url=858014f3-3934-4abe-8078-4aa193e74ca8&ring={release_type}&lang=en-US", headers={
@@ -292,7 +285,7 @@ jobs:
           sudo mount -o loop ${{ matrix.arch }}/product.img system/product
           sudo mount -o loop ${{ matrix.arch }}/system_ext.img system/system_ext
       - name: Integrate Magisk
-        if: ${{ github.event.inputs.root_sol == 'magisk' || github.event.inputs.root_sol == '' }}
+        if: ${{ github.event.inputs.magisk_apk != 'none' }}
         run: |
           sudo mkdir system/sbin
           sudo chcon --reference system/init.environ.rc system/sbin
@@ -620,13 +613,11 @@ jobs:
       - name: Generate artifact name
         run: |
           variant="${{ github.event.inputs.gapps_variant }}"
-          root="${{ github.event.inputs.root_sol }}"
+          root="${{ github.event.inputs.magisk_apk }}"
           if [[ "$root" = "none" ]]; then
             name1=""
-          elif [[ "$root" = "" ]]; then
-            name1="-with-magisk"
           else
-            name1="-with-${root}"
+            name1="-with-magisk"
           fi
           if [[ "$variant" = "none" || "$variant" = "" ]]; then
             name2="-NoGApps"

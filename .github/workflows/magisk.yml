@@ -164,7 +164,6 @@ jobs:
 
           print("done", flush=True)
       - name: Download Magisk
-        if: ${{ github.event.inputs.magisk_apk != 'none' }}
         shell: python
         run: |
           import urllib.request
@@ -175,7 +174,7 @@ jobs:
 
           magisk_apk = """${{ github.event.inputs.magisk_apk }}"""
 
-          if not magisk_apk:
+          if not magisk_apk or magisk_apk == "none":
               magisk_apk = "stable"
           if magisk_apk == "stable" or magisk_apk == "beta" or magisk_apk == "canary" or magisk_apk == "debug":
               magisk_apk = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/{magisk_apk}.json").content)['magisk']['link']
@@ -417,14 +416,12 @@ jobs:
           sudo find system/system/{app,framework,priv-app} -type f -exec chcon --reference=system/system/framework/ext.jar {} \;
           ls gapps/etc/ | xargs -n 1 -I dir sudo find system/system/etc/dir -type f -exec chcon --reference=system/system/etc/permissions {} \;
           sudo find system/product/{app,etc,overlay,priv-app} -type f -exec chcon --reference=system/product/etc/permissions/privapp-permissions-venezia.xml {} \;
-          if [ -f ./magiskpolicy ]; then
-              sudo patchelf --replace-needed libc.so "${HOME}/libc.so" ./magiskpolicy || true
-              sudo patchelf --replace-needed libm.so "${HOME}/libm.so" ./magiskpolicy || true
-              sudo patchelf --replace-needed libdl.so "${HOME}/libdl.so" ./magiskpolicy || true
-              sudo patchelf --set-interpreter "${HOME}/linker64" ./magiskpolicy || true
-              chmod +x ./magiskpolicy
-              sudo ./magiskpolicy --load system/vendor/etc/selinux/precompiled_sepolicy --save system/vendor/etc/selinux/precompiled_sepolicy "allow gmscore_app gmscore_app vsock_socket { create connect write read }" "allow gmscore_app device_config_runtime_native_boot_prop file read" "allow gmscore_app system_server_tmpfs dir search" "allow gmscore_app system_server_tmpfs file open"
-          fi
+          sudo patchelf --replace-needed libc.so "${HOME}/libc.so" ./magiskpolicy || true
+          sudo patchelf --replace-needed libm.so "${HOME}/libm.so" ./magiskpolicy || true
+          sudo patchelf --replace-needed libdl.so "${HOME}/libdl.so" ./magiskpolicy || true
+          sudo patchelf --set-interpreter "${HOME}/linker64" ./magiskpolicy || true
+          chmod +x ./magiskpolicy
+          sudo ./magiskpolicy --load system/vendor/etc/selinux/precompiled_sepolicy --save system/vendor/etc/selinux/precompiled_sepolicy "allow gmscore_app gmscore_app vsock_socket { create connect write read }" "allow gmscore_app device_config_runtime_native_boot_prop file read" "allow gmscore_app system_server_tmpfs dir search" "allow gmscore_app system_server_tmpfs file open"
       - name: Fix GApps prop
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         shell: sudo python {0}

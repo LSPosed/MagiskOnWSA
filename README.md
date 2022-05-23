@@ -93,7 +93,7 @@ https://user-images.githubusercontent.com/5022927/145696886-e13ebfc1-ff25-4410-8
     No. Magisk has bugs preventing itself running on WSA. Magisk 24+ has fixed them. So you must use Magisk 24 or higher version.
 - How can I get rid of Magisk?
 
-    Choose `none` as root solution.
+    Choose `none` as Magisk version.
 - Github Action script is updated, how can I synchronize it?
 
     1. In your fork repository, click `fetch upstream`

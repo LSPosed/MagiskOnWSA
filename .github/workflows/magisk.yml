@@ -144,9 +144,13 @@ jobs:
                           print(f"unzipping to {zip_name}", flush=True)
                           zip.extract(f)
                           ver_no = zip_name.split("_")
-                          ver = ver_no[1]
+                          long_ver = ver_no[1]
+                          ver=long_ver.split(".")
+                          main_ver=ver[1]
                           with open(os.environ['GITHUB_ENV'], 'a') as g:
-                              g.write(f'WSA_VER={ver}\n')
+                              g.write(f'WSA_VER={long_ver}\n')
+                          with open(os.environ['GITHUB_ENV'], 'a') as g:
+                              g.write(f'WSA_MAIN_VER={main_ver}\n')
                           rel = ver_no[3].split(".")
                           rell = str(rel[0])
                           with open(os.environ['GITHUB_ENV'], 'a') as g:
@@ -234,7 +238,8 @@ jobs:
           import re
 
           arch = "${{ matrix.arch }}"
-          variant = "${{ github.event.inputs.gapps_variant }}"
+          # TODO: if it's an Android 12.1 base WSA keep it pico since other variants of opengapps unable to boot successfully
+          variant = "${{ github.event.inputs.gapps_variant }}" if int("${{ env.WSA_MAIN_VER }}") < 2204 else "pico"
           abi_map = {"x64" : "x86_64", "arm64": "arm64"}
           # TODO: keep it 11.0 since opengapps does not support 12+ yet
           # As soon as opengapps is available for 12+, we need to get the sdk/release from build.prop and

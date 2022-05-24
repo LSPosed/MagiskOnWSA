@@ -238,7 +238,7 @@ jobs:
           import re
 
           arch = "${{ matrix.arch }}"
-          # TODO: if it's an Android 12.1 base WSA keep it pico since other variants of opengapps unable to boot successfully
+          # TODO: if it's an Android 12.1 base WSA keep it pico since other variants of opengapps are unable to boot successfully
           variant = "${{ github.event.inputs.gapps_variant }}" if int("${{ env.WSA_MAIN_VER }}") < 2204 else "pico"
           abi_map = {"x64" : "x86_64", "arm64": "arm64"}
           # TODO: keep it 11.0 since opengapps does not support 12+ yet

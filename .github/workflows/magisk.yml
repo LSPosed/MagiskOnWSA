@@ -624,7 +624,13 @@ jobs:
           EOF
       - name: Generate artifact name
         run: |
-          variant="${{ github.event.inputs.gapps_variant }}"
+          echo "### MagiskOnWSA" >> $GITHUB_STEP_SUMMARY
+          if [[ ${{ env.WSA_MAIN_VER }} -lt 2204 ]]; then
+            variant="${{ github.event.inputs.gapps_variant }}"
+          else
+            echo ":warning: Since OpenGapps doesn't officially support Android 12.1 yet, lock the variant to pico!"  >> $GITHUB_STEP_SUMMARY
+            variant="pico"
+          fi
           root="${{ github.event.inputs.root_sol }}"
           if [[ "$root" = "none" ]]; then
             name1=""

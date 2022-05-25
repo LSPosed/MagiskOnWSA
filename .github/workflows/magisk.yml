@@ -636,7 +636,7 @@ jobs:
           if [[ "$variant" = "none" || "$variant" = "" ]]; then
             name2="-NoGApps"
           else
-            if [[ ${{ env.WSA_MAIN_VER }} -lt 2204 && "$variant" != "pico" ]]; then
+            if [[ ${{ env.WSA_MAIN_VER }} -ge 2204 && "$variant" != "pico" ]]; then
               echo "### MagiskOnWSA" >> $GITHUB_STEP_SUMMARY
               echo ":warning: Since OpenGapps doesn't officially support Android 12.1 yet, lock the variant to pico!"  >> $GITHUB_STEP_SUMMARY
               variant="pico"

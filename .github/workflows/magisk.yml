@@ -9,17 +9,12 @@ on:
         type: choice
         options:
         - x64
-        - arm64
-        - x64 & arm64
       release_type:
         description: "WSA release type"
         required: true
         default: "retail"
         type: choice
         options:
-        - retail
-        - release preview
-        - insider slow
         - insider fast
       magisk_apk:
         description: "Magisk version"
@@ -28,25 +23,13 @@ on:
         type: choice
         options:
         - stable
-        - beta
-        - canary
-        - debug
       gapps_variant:
         description: "Variants of gapps"
         required: true
         default: "none"
         type: choice
         options:
-        - none
-        - super
-        - stock
-        - full
-        - mini
-        - micro
-        - nano
         - pico
-        - tvstock
-        - tvmini
       root_sol:
         description: "Root solution"
         required: true
@@ -54,7 +37,6 @@ on:
         type: choice
         options:
         - magisk
-        - none
 
 jobs:
   matrix:
@@ -68,16 +50,13 @@ jobs:
         with:
           script: |
             let matrix = {};
-            let arch = "${{ github.event.inputs.arch }}"
+            let arch = "x64"
             switch ( arch ) {
               case "x64":
                 matrix.arch = ["x64"];
                 break;
-              case "arm64":
-                matrix.arch = ["arm64"];
-                break;
               default:
-                matrix.arch = ["x64", "arm64"];
+                matrix.arch = ["x64"];
                 break;
             }
             core.setOutput("matrix",JSON.stringify(matrix));
@@ -105,9 +84,9 @@ jobs:
           import os
           import urllib.request
 
-          arch = "${{ matrix.arch }}"
+          arch = "x64"
           release_type_map = {"retail": "Retail", "release preview": "RP", "insider slow": "WIS", "insider fast": "WIF"}
-          release_type = release_type_map["${{ github.event.inputs.release_type }}"] if "${{ github.event.inputs.release_type }}" != "" else "Retail"
+          release_type = release_type_map["insider fast"] if "insider fast" != "" else "WIF"
 
           res = requests.post("https://store.rg-adguard.net/api/GetFiles", f"type=CategoryId&url=858014f3-3934-4abe-8078-4aa193e74ca8&ring={release_type}&lang=en-US", headers={
               "content-type": "application/x-www-form-urlencoded"
@@ -183,7 +162,7 @@ jobs:
           import json
           import requests
 
-          magisk_apk = """${{ github.event.inputs.magisk_apk }}"""
+          magisk_apk = """stable"""
 
           if not magisk_apk:
               magisk_apk = "stable"

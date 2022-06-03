@@ -12,7 +12,7 @@
 - 在 Windows 11 中自动激活开发者模式
 - 通过一键脚本更新到新版本，同时可以保留数据
 - 包含所有语言
-- 支持管理开始菜单图标 (需要手动安装 [WSAHelper](https://github.com/LSPosed/WSAHelper/releases/latest) to use this feature)
+- 支持管理开始菜单图标 (需要手动安装 [WSAHelper](https://github.com/LSPosed/WSAHelper/releases/latest) 以使用此功能)
 
 ## 视频教程
 
@@ -46,63 +46,63 @@ https://user-images.githubusercontent.com/5022927/145696886-e13ebfc1-ff25-4410-8
 
 ## 常见问题
 
-- Actions workflow task `Delete workflow runs` run Failed
+- 删除 Workflow runs 失败
 
-    Check workflow permissions, should be `Read and write permissions`
+    检查 Workblow 权限，应设置为“读写权限”
 
      ![permissions](https://user-images.githubusercontent.com/40033067/168649322-dadaafc9-dd31-4922-afe1-8aa933b7b036.png)
 
-     Read the [Github Docs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#configuring-the-default-github_token-permissions) to find out how to change this setting
+     阅读[Github文档](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#configuring-the-default-github_token-permissions)以了解如何更改此设置
 
-- Why should delete old workflow runs
+- 为什么要删除旧的Workflow runs
 
-    Keeping old workflow runs can take up a lot of storage resources and is suspected to be abusive, which can lead to banning
-- Can I delete the unzipped folder?
+    保留旧的Workflow runs会占用大量的存储空间且可能被怀疑滥用，这可能导致封禁
+- 我可以删除解压后的文件夹吗？
 
-    No.
-- Why the size of the zip does not match the one shown?
+    不可以。
+- 为什么Zip的大小与显示的不匹配？
 
-   The zip you downloaded is compressed and Github is showing the uncompressed size.
-- How can I update WSA to new version?
+   你下载的Zip已经过压缩，但Github显示的是未经压缩的大小
+- 如何更新WSA？
 
-    Rerun the Github action, download the new artifact, replace the content of your previous installation and rerun `Install.ps1`. Don't worry, your data will be preserved.
+    重新运行Github的Action，下载新Artifact，替换之前安装的内容并重新运行“Install.ps1”。不用担心，你的数据将被保留。
 - How can I get the logcat from WSA?
 
     `%LOCALAPPDATA%\Packages\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe\LocalState\diagnostics\logcat`
-- How can I update Magisk to new version?
+- 如何更新Magisk？
 
-    Do the same as updating WSA
-- How to pass safetynet?
+    执行与更新WSA相同的操作
+- 如何破解safetynet？
 
-    Like all the other emulators, no way.
-- Virtualization is not enabled?
+    像所有其它模拟器一样，没办法。
+- 没有启用虚拟化？
 
-    `Install.ps1` helps you enable it if not enabled. After rebooting, rerun `Install.ps1` to install WSA. If it's still not working, you have to enable virtualization in BIOS. That's a long story so ask Google for help.
-- How to remount system as read-write?
+    如果未启用，“Install.ps1”会启用它。重启后，运行“Install.ps1”以安装WSA。如果仍然无法正常工作，则需要在BIOS中开启虚拟化，请百度寻找解决方法。
+- 如何挂载系统分区为读写？
 
-    No way in WSA since it's mounted as read-only by Hyper-V. You can modify system by making a Magisk module. Or directly modify system.img. Ask Google for help.
-- I cannot `adb connect localhost:58526`
+    在WSA中没办法，因为它是由Hyper-V以只读方式安装的。你也可以直接修改system.img。百度寻找解决方法。
+- 我不能“adb connect localhost:58526”
 
-    Make sure developer mode is enabled. If the issue persists, check the IP address of WSA in the setting page and try `adb connect ip:5555`.
-- Magisk online module list is empty?
+    确保已启用开发者模式。如果问题仍然存在，请在WSA设置中查看IP地址再尝试“adb connnect ip:5555”
+- Magisk在线模块列表为空？
 
-    Magisk actively remove online module repository. You can install module locally or by `adb push module.zip /data/local/tmp` and `adb shell su -c magisk --install-module /data/local/tmp/module.zip`.
-- Can I use Magisk 23.0 stable or lower version?
+    Magisk会删除在线模块存储库。你可以在本地安装模块，或通过“adb push module.zip /data/local/tmp”和“adb shell su -c magisk --install-module /data/local/tmp/module.zip”安装模块。
+- 我可以使用Magisk 23.0或更低版本吗？
 
-    No. Magisk has bugs preventing itself running on WSA. Magisk 24+ has fixed them. So you must use Magisk 24 or higher version.
-- How can I get rid of Magisk?
+    不可以，Magisk有无法在WSA上运行的BUG。而Magisk 24+已修复这些BUG。所以你必须使用Magisk 24或更高版本。
+- 我可以不使用Magisk吗？
 
-    Choose `none` as root solution.
-- Github Action script is updated, how can I synchronize it?
+    在ROOT解决方案中选择“none”。
+- 如何更新Github Action脚本？
 
-    1. In your fork repository, click `fetch upstream`
+    1. 在你fork的存储库中，点击“fetch upstream”
         ![fetch](https://docs.github.com/assets/cb-33284/images/help/repository/fetch-upstream-drop-down.png)
-    1. Then and click `fetch and merge`
+    1. 然后点击“fetch and merge”
         ![merge](https://docs.github.com/assets/cb-128489/images/help/repository/fetch-and-merge-button.png)
 
-## Credits
+## 贡献
 
-- [Magisk](https://github.com/topjohnwu/Magisk): The most famous root solution on Android
-- [The Open GApps Project](https://opengapps.org): One of the most famous Google Apps packages solution
-- [WSA-Kernel-SU](https://github.com/LSPosed/WSA-Kernel-SU) and [kernel-assisted-superuser](https://git.zx2c4.com/kernel-assisted-superuser/): The kernel `su` for debugging Magisk Integration
-- [WSAGAScript](https://github.com/ADeltaX/WSAGAScript): The first GApps integration script for WSA
+- [Magisk](https://github.com/topjohnwu/Magisk): Android上最著名的ROOT解决方案
+- [The Open GApps Project](https://opengapps.org): 最著名的谷歌软件解决方案之一
+- [WSA-Kernel-SU](https://github.com/LSPosed/WSA-Kernel-SU) 和 [kernel-assisted-superuser](https://git.zx2c4.com/kernel-assisted-superuser/): 用于调试Magisk Integration 的内核“su”
+- [WSAGAScript](https://github.com/ADeltaX/WSAGAScript): WSA的第一个GApps集成脚本

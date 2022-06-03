@@ -1,38 +1,38 @@
-name: Build WSA
+name: 构建WSA
 on:
   workflow_dispatch:
     inputs:
       arch:
-        description: "Build arch"
+        description: "构建arch"
         required: true
-        default: "x64 & arm64"
+        default: "x64和arm64"
         type: choice
         options:
         - x64
         - arm64
-        - x64 & arm64
+        - x64和arm64
       release_type:
-        description: "WSA release type"
+        description: "WSA版本类型"
         required: true
-        default: "retail"
+        default: "稳定版"
         type: choice
         options:
-        - retail
-        - release preview
-        - insider slow
-        - insider fast
+        - 稳定版
+        - 发布预览版
+        - 慢速预览版
+        - 快速预览版
       magisk_apk:
-        description: "Magisk version"
+        description: "Magisk版本"
         required: true
-        default: "stable"
+        default: "稳定版"
         type: choice
         options:
-        - stable
-        - beta
-        - canary
-        - debug
+        - 稳定版
+        - 测试版
+        - canary版
+        - 开发版
       gapps_variant:
-        description: "Variants of gapps"
+        description: "Gapps版本"
         required: true
         default: "none"
         type: choice
@@ -48,7 +48,7 @@ on:
         - tvstock
         - tvmini
       root_sol:
-        description: "Root solution"
+        description: "Root方案"
         required: true
         default: "magisk"
         type: choice
@@ -88,14 +88,14 @@ jobs:
     strategy:
       matrix: ${{fromJson(needs.matrix.outputs.matrix)}}
     steps:
-      - name: Dependencies
+      - name: 依赖项
         run: |
           pip3 install beautifulsoup4 lxml
           sudo apt-get update && sudo apt-get install setools lzip wine winetricks patchelf
           wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- -C ~ --strip-component=2 '*/wine/*' '*/linker/*'
           winetricks msxml6
           echo "163.172.251.201 store.rg-adguard.net" | sudo tee -a /etc/hosts
-      - name: Download WSA
+      - name: 下载WSA
         shell: python
         run: |
           import requests
@@ -174,7 +174,7 @@ jobs:
                   zip.extractall(arch)
 
           print("done", flush=True)
-      - name: Download Magisk
+      - name: 下载Magisk
         shell: python
         run: |
           import urllib.request
@@ -226,7 +226,7 @@ jobs:
                 extract_as(zip, f"lib/{ abi_map['x64'][0] }/libmagiskinit.so", "magiskpolicy", ".")
               extract_as(zip, f"assets/boot_patch.sh", "boot_patch.sh", "magisk")
               extract_as(zip, f"assets/util_functions.sh", "util_functions.sh", "magisk")
-      - name: Download OpenGApps
+      - name: 下载OpenGApps
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         shell: python
         run: |
@@ -262,7 +262,7 @@ jobs:
               urllib.request.urlretrieve(link, out_file)
           print("done", flush=True)
 
-      - name: Extract GApps and expand images
+      - name: 解压GApps并扩大镜像
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         run: |
           mkdir gapps
@@ -273,7 +273,7 @@ jobs:
           resize2fs ${{ matrix.arch }}/product.img 1024M
           e2fsck -yf ${{ matrix.arch }}/system_ext.img
           resize2fs ${{ matrix.arch }}/system_ext.img 200M
-      - name: Expand vendor and system
+      - name: 扩大Vendor和System分区
         run: |
           e2fsck -yf ${{ matrix.arch }}/system.img
           system_size=$(( $(du -sB512 ${{ matrix.arch }}/system.img | cut -f1) + 20000 ))
@@ -289,14 +289,14 @@ jobs:
           resize2fs ${{ matrix.arch }}/system.img "$system_size"s
           e2fsck -yf ${{ matrix.arch }}/vendor.img
           resize2fs ${{ matrix.arch }}/vendor.img 400M
-      - name: Mount images
+      - name: 挂载镜像
         run: |
           sudo mkdir system
           sudo mount -o loop ${{ matrix.arch }}/system.img system
           sudo mount -o loop ${{ matrix.arch }}/vendor.img system/vendor
           sudo mount -o loop ${{ matrix.arch }}/product.img system/product
           sudo mount -o loop ${{ matrix.arch }}/system_ext.img system/system_ext
-      - name: Integrate Magisk
+      - name: 安装Magisk
         if: ${{ github.event.inputs.root_sol == 'magisk' || github.event.inputs.root_sol == '' }}
         run: |
           sudo mkdir system/sbin
@@ -382,7 +382,7 @@ jobs:
               seclabel u:r:magisk:s0
               oneshot
           EOF
-      - name: Merge Language Resources
+      - name: 安装语言包
         run: |
           cp ${{ matrix.arch }}/resources.pri pri/en-us.pri
           cp ${{ matrix.arch }}/AppxManifest.xml xml/en-us.xml
@@ -397,13 +397,13 @@ jobs:
           EOF
           wine64 ~/makepri.exe new /pr pri /in MicrosoftCorporationII.WindowsSubsystemForAndroid /cf priconfig.xml /of ${{ matrix.arch }}/resources.pri /o
           sed -i -zE "s/<Resources.*Resources>/<Resources>\n$(cat xml/* | grep -Po '<Resource [^>]*/>' | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/\$/\\$/g' | sed 's/\//\\\//g')\n<\/Resources>/g" ${{ matrix.arch }}/AppxManifest.xml
-      - name: Add extra packages
+      - name: 添加额外资源
         run: |
           wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- --strip-component=2 '*/${{ matrix.arch }}/system/*'
           sudo find system/system/priv-app -type d -exec chmod 0755 {} \;
           sudo find system/system/priv-app -type f -exec chmod 0644 {} \;
           sudo find system/system/priv-app -exec chcon --reference=system/system/priv-app {} \;
-      - name: Integrate GApps
+      - name: 安装GApps
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         run: |
           wget -qO- "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_REF.tar.gz" | sudo tar --wildcards -zxvf- --strip-component=2 '*/${{ matrix.arch }}/gapps/*'
@@ -434,7 +434,7 @@ jobs:
           sudo patchelf --set-interpreter "${HOME}/linker64" ./magiskpolicy || true
           chmod +x ./magiskpolicy
           sudo ./magiskpolicy --load system/vendor/etc/selinux/precompiled_sepolicy --save system/vendor/etc/selinux/precompiled_sepolicy "allow gmscore_app gmscore_app vsock_socket { create connect write read }" "allow gmscore_app device_config_runtime_native_boot_prop file read" "allow gmscore_app system_server_tmpfs dir search" "allow gmscore_app system_server_tmpfs file open"
-      - name: Fix GApps prop
+      - name: 修复GApps Prop
         if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
         shell: sudo python {0}
         run: |
@@ -510,13 +510,13 @@ jobs:
 
           for sec, prop in {"system": "system/system/build.prop", "product": "system/product/build.prop", "system_ext": "system/system_ext/build.prop", "vendor": "system/vendor/build.prop", "odm": "system/vendor/odm/etc/build.prop"}.items():
               fix_prop(sec, prop)
-      - name: Umount images
+      - name: 卸载镜像
         run: |
           sudo umount system/vendor
           sudo umount system/product
           sudo umount system/system_ext
           sudo umount system
-      - name: Shrink images
+      - name: 缩小镜像
         run: |
           e2fsck -yf ${{ matrix.arch }}/system.img
           resize2fs -M ${{ matrix.arch }}/system.img
@@ -526,7 +526,7 @@ jobs:
           resize2fs -M ${{ matrix.arch }}/product.img
           e2fsck -yf ${{ matrix.arch }}/system_ext.img
           resize2fs -M ${{ matrix.arch }}/system_ext.img
-      - name: Remove signature and add scripts
+      - name: 删除签名并添加脚本
         run: |
           rm -rf ${{ matrix.arch }}/\[Content_Types\].xml ${{ matrix.arch }}/AppxBlockMap.xml ${{ matrix.arch }}/AppxSignature.p7x ${{ matrix.arch }}/AppxMetadata
           cp vclibs.appx xaml.appx ${{ matrix.arch }}
@@ -622,7 +622,7 @@ jobs:
           Write-Host "All Done\`r\`nPress any key to exit"
           \$null = \$Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
           EOF
-      - name: Generate artifact name
+      - name: 生成Artifact名称
         run: |
           variant="${{ github.event.inputs.gapps_variant }}"
           root="${{ github.event.inputs.root_sol }}"
@@ -644,12 +644,12 @@ jobs:
             name2="-GApps-${variant}"
           fi
           echo "artifact_name=WSA${name1}${name2}_${{ env.WSA_VER }}_${{ matrix.arch }}_${{ env.WSA_REL }}" >> $GITHUB_ENV
-      - name: Upload WSA
+      - name: 上传WSA
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.artifact_name }}
           path: "./${{ matrix.arch }}/*"
-      - name: Delete workflow runs
+      - name: 删除Workflow Runs
         uses: Mattraks/delete-workflow-runs@v2
         with:
           token: ${{ github.token }}

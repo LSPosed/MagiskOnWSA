@@ -106,7 +106,7 @@ jobs:
           import urllib.request
 
           arch = "${{ matrix.arch }}"
-          release_type_map = {"retail": "Retail", "release preview": "RP", "insider slow": "WIS", "insider fast": "WIF"}
+          release_type_map = {"稳定版": "Retail", "发布预览版": "RP", "慢速预览版": "WIS", "快速预览版": "WIF"}
           release_type = release_type_map["${{ github.event.inputs.release_type }}"] if "${{ github.event.inputs.release_type }}" != "" else "Retail"
 
           res = requests.post("https://store.rg-adguard.net/api/GetFiles", f"type=CategoryId&url=858014f3-3934-4abe-8078-4aa193e74ca8&ring={release_type}&lang=en-US", headers={
@@ -186,8 +186,8 @@ jobs:
           magisk_apk = """${{ github.event.inputs.magisk_apk }}"""
 
           if not magisk_apk:
-              magisk_apk = "stable"
-          if magisk_apk == "stable" or magisk_apk == "beta" or magisk_apk == "canary" or magisk_apk == "debug":
+              magisk_apk = "稳定版"
+          if magisk_apk == "稳定版" or magisk_apk == "测试版" or magisk_apk == "canary版" or magisk_apk == "开发版":
               magisk_apk = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/{magisk_apk}.json").content)['magisk']['link']
               
           out_file = "magisk.zip"

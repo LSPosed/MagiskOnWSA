@@ -1,51 +1,50 @@
-# Magisk on WSA (with Google Apps)
+# 适用于 Windows 安卓子系统的 Magisk（带有谷歌软件）
+## 功能
 
-## Features
+- 点击几下即可集成 Magisk 和 OpenGApps
+- 无需 Linux 环境即可集成
+- 使每个版本保持最新
+- 支持64位和ARM64
+- 支持除Aroma之外的所有OpenGApps变体（aroma不支持x86_64，请使用super代替）
+- 修复 DocumentUI 的外部存储访问
+- 修复VPN对话框不显示 (使用我们的[VpnDialogs app](https://github.com/LSPosed/VpnDialogs))
+- 无人值守安装
+- 在 Windows 11 中自动激活开发者模式
+- 通过一键脚本更新到新版本，同时可以保留数据
+- 包含所有语言
+- 支持管理开始菜单图标 (需要手动安装 [WSAHelper](https://github.com/LSPosed/WSAHelper/releases/latest) to use this feature)
 
-- Integrate Magisk and OpenGApps in a few clicks within minutes
-- No Linux environment required for integration
-- Keep each build up to date
-- Support both ARM64 and x64
-- Support all OpenGApps variants except for aroma (aroma does not support x86_64, please use super instead)
-- Fix external storage access of DocumentUI
-- Fix VPN dialog not showing (use our [VpnDialogs app](https://github.com/LSPosed/VpnDialogs))
-- Unattended installation
-- Automatically activates developers mode in Windows 11
-- Update to new version while preserving data with one-click script
-- Merged all language packs
-- Support managing start menu icons (manually installing [WSAHelper](https://github.com/LSPosed/WSAHelper/releases/latest) to use this feature)
-
-## Video Guide
+## 视频教程
 
 https://user-images.githubusercontent.com/5022927/145696886-e13ebfc1-ff25-4410-893e-d3e517af70ea.mp4
 
-## Text Guide
+## 文字教程
 
-1. Star (if you like) and fork this repo (keep it PUBLIC, private repo is not supported)
-1. Go to the **Action** tab in your forked repo
+1. 加星（如果你喜欢）并 fork 这个 repo (需要保持公开, 不支持私人 repo)
+1. 在你已经fork的repo中点击 **Action** 选项卡
     ![Action Tab](https://docs.github.com/assets/images/help/repository/actions-tab.png)
-1. In the left sidebar, click the **Build WSA** workflow.
+1. 点击左边的 **Build WSA** 工作流
     ![Workflow](https://docs.github.com/assets/images/actions-select-workflow.png)
-1. Above the list of workflow runs, select **Run workflow**
+1. 在工作流运行列表上方点击 **Run workflow**
     ![Run Workflow](https://docs.github.com/assets/images/actions-workflow-dispatch.png)
-1. Select the version of Magisk and select the [OpenGApps variant](https://github.com/opengapps/opengapps/wiki#variants) (none is no OpenGApps) you like, select the root solution (none means no root), select WSA version and its architecture (mostly x64) and click **Run workflow**
+1. 选择你喜欢的 Magisk 的版本和[ OpenGApps 变体](https://github.com/opengapps/opengapps/wiki#variants) (none 就是没有 OpenGApps) , 然后选择 root 方式（none 就是没有 root），最后选择 WSA 版本和体系结构（一般是64位），并点击 **Run workflow**
     ![Run Workflow](https://docs.github.com/assets/images/actions-manually-run-workflow.png)
-1. Wait for the action to complete and download the artifact **DO NOT download it via multithread downloaders like IDM or ADM**
+1. 等待 Action 完成并下载 Artifact，**不要使用 IDM 或 ARM 等多线程下载器下载**
     ![Download](https://docs.github.com/assets/images/help/repository/artifact-drop-down-updated.png)
-1. Unzip the artifact
-    - The size shown in the webpage is uncompressed size and the zip you download will be compressed. So the size of the zip will be much less than the size shown in the webpage.
-1. Right-click `Install.ps1` and select `Run with PowerShell`
-    - If you previously have a MagiskOnWSA installation, it will automatically uninstall the previous while **preserving all userdata** and install the new one, so don't worry about your data.
-    - If you have an official WSA installation, you should uninstall it first. (In case you want to preserve your data, you can backup `%LOCALAPPDATA%\Packages\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe\LocalCache\userdata.vhdx` before uninstallation and restore it after installation.) (If you want to restore the icons to start menu, please install and use [WSAHelper](https://github.com/LSPosed/WSAHelper/releases/latest).)
-    - If the popup windows disappear **without asking administrative permission** and WSA is not installed successfully, you should manually run `Install.ps1` as administrator:
-        1. Press `Win+x` and select `Windows Terminal (Admin)`
-        2. Input `cd "{X:\path\to\your\extracted\folder}"` and press `enter`, and remember to replace `{X:\path\to\your\extracted\folder}` including the `{}`, for example `cd "D:\wsa"`
-        3. Input `PowerShell.exe -ExecutionPolicy Bypass -File .\Install.ps1` and press `enter`
-        4. The script will run and WSA will be installed
-        5. If this workaround does not work, your PC is not supported for WSA
-1. Magisk/Play store will be launched. Enjoy by installing LSPosed-zygisk with zygisk enabled or Riru and LSPosed-riru
+1. 解压 Artifact
+    - 网页中显示的是未压缩的大小，你下载的 Zip 将被压缩。所以你下载的 Zip 大小会比网页中显示的小很多.
+1. 右键“Install.ps1”并点击“使用 PowerShell 运行
+    - 如果你之前安装过 MagiskOnWSA，它会自动卸载以前的版本同时 **保留所有用户数据** 并安装新版本，所以无需担心你的数据
+    - 如果你已经安装了应用商店里的 WSA 子系统，则应先将其卸载（如果你想保留数据，可以在安装前备份 “%LOCALAPPDATA%\Packages\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe\LocalCache\userdata.vhdx”并在安装后恢复备份）（如果要恢复图标到开始菜单，请安装[WSAHelper](https://github.com/LSPosed/WSAHelper/releases/latest).）
+    - 如果弹出的窗口消失且 **没有请求管理员许可**，WSA也没有安装成功，你应该以管理员身份手动运行“Install.ps1”
+        1. 按“Win+X”并点击“Windows 终端（管理员）”
+        2. 输入“cd "{X:\path\to\your\extracted\folder}"”并按回车键，记得更换“{X:\path\to\your\extracted\folder}”，包括“{}”，例如“cd "D:\WSA"”
+        3. 输入“PowerShell.exe -ExecutionPolicy Bypass -File .\Install.ps1”并按回车
+        4. 脚本将运行并安装 WSA
+        5. 如果此解决方法不起作用，则你的电脑可能不支持 WSA
+1. Magisk/Play商店将启动。通过安装 LSPosed-zygisk 并启用 zygisk 或 Riru 和 LSPosed-riru 来享受 WSA
 
-## FAQ
+## 常见问题
 
 - Actions workflow task `Delete workflow runs` run Failed
 

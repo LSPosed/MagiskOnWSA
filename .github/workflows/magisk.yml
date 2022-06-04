@@ -638,7 +638,7 @@ jobs:
           else
             if [[ ${{ env.WSA_MAIN_VER }} -ge 2204 && "$variant" != "pico" ]]; then
               echo "### MagiskOnWSA" >> $GITHUB_STEP_SUMMARY
-              echo ":warning: Since OpenGapps doesn't officially support Android 12.1 yet, lock the variant to pico!"  >> $GITHUB_STEP_SUMMARY
+              echo ":警告：由于OpenGapps尚未正式支持Android12.1，已将版本锁定为pico！"  >> $GITHUB_STEP_SUMMARY
               variant="pico"
             fi
             name2="-GApps-${variant}"

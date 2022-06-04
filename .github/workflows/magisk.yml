@@ -24,13 +24,13 @@ on:
       magisk_apk:
         description: "Magisk版本"
         required: true
-        default: "稳定版"
+        default: "stable"
         type: choice
         options:
-        - 稳定版
-        - 测试版
-        - canary版
-        - 开发版
+        - stable
+        - beta
+        - canary
+        - debug
       gapps_variant:
         description: "Gapps版本"
         required: true
@@ -186,8 +186,8 @@ jobs:
           magisk_apk = """${{ github.event.inputs.magisk_apk }}"""
 
           if not magisk_apk:
-              magisk_apk = "稳定版"
-          if magisk_apk == "稳定版" or magisk_apk == "测试版" or magisk_apk == "canary版" or magisk_apk == "开发版":
+              magisk_apk = "stable"
+          if magisk_apk == "stable" or magisk_apk == "beta" or magisk_apk == "canary" or magisk_apk == "debug":
               magisk_apk = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/{magisk_apk}.json").content)['magisk']['link']
               
           out_file = "magisk.zip"

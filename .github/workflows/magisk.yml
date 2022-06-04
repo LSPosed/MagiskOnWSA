@@ -88,7 +88,7 @@ jobs:
     strategy:
       matrix: ${{fromJson(needs.matrix.outputs.matrix)}}
     steps:
-      - name: 依赖项
+      - name: 安装依赖项
         run: |
           pip3 install beautifulsoup4 lxml
           sudo apt-get update && sudo apt-get install setools lzip wine winetricks patchelf
@@ -107,7 +107,7 @@ jobs:
 
           arch = "${{ matrix.arch }}"
           release_type_map = {"稳定版": "Retail", "发布预览版": "RP", "慢速预览版": "WIS", "快速预览版": "WIF"}
-          release_type = release_type_map["${{ github.event.inputs.release_type }}"] if "${{ github.event.inputs.release_type }}" != "" else "Retail"
+          release_type = release_type_map["${{ github.event.inputs.release_type }}"] if "${{ github.event.inputs.release_type }}" != "" else "稳定版"
 
           res = requests.post("https://store.rg-adguard.net/api/GetFiles", f"type=CategoryId&url=858014f3-3934-4abe-8078-4aa193e74ca8&ring={release_type}&lang=en-US", headers={
               "content-type": "application/x-www-form-urlencoded"

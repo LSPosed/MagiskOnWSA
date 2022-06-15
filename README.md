@@ -54,9 +54,9 @@ https://user-images.githubusercontent.com/5022927/145696886-e13ebfc1-ff25-4410-8
 
      Read the [Github Docs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#configuring-the-default-github_token-permissions) to find out how to change this setting
 
-- Why should delete old workflow runs
+- Why should we delete old workflow runs?
 
-    Keeping old workflow runs can take up a lot of storage resources and is suspected to be abusive, which can lead to banning
+    Keeping old workflow runs can take up a lot of storage resources and is suspected to be abusive, which can lead to banning.
 - Can I delete the unzipped folder?
 
     No.

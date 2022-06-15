@@ -6,7 +6,6 @@
 - 使每个版本保持最新
 - 支持64位和ARM64
 - 支持除Aroma之外的所有OpenGApps变体（aroma不支持x86_64，请使用super代替）
-- 修复 DocumentUI 的外部存储访问
 - 修复VPN对话框不显示 (使用我们的[VpnDialogs app](https://github.com/LSPosed/VpnDialogs))
 - 无人值守安装
 - 在 Windows 11 中自动激活开发者模式

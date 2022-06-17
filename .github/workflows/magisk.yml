@@ -47,6 +47,14 @@ on:
         - pico
         - tvstock
         - tvmini
+      remove_amazon:
+        description: "Remove Amazon AppStore"
+        required: true
+        default: "keep"
+        type: choice
+        options:
+        - keep
+        - remove
       root_sol:
         description: "Root solution"
         required: true
@@ -296,6 +304,10 @@ jobs:
           sudo mount -o loop ${{ matrix.arch }}/vendor.img system/vendor
           sudo mount -o loop ${{ matrix.arch }}/product.img system/product
           sudo mount -o loop ${{ matrix.arch }}/system_ext.img system/system_ext
+      - name: Remove Amazon AppStore
+        if: ${{ github.event.inputs.remove_amazon != 'keep' && github.event.inputs.remove_amazon != '' }}
+        run: |
+          find system/product/{etc/permissions,etc/sysconfig,framework,priv-app} | grep -e amazon -e venezia | sudo xargs rm -rf
       - name: Integrate Magisk
         if: ${{ github.event.inputs.root_sol == 'magisk' || github.event.inputs.root_sol == '' }}
         run: |
@@ -427,7 +439,7 @@ jobs:
 
           sudo find system/system/{app,framework,priv-app} -type f -exec chcon --reference=system/system/framework/ext.jar {} \;
           ls gapps/etc/ | xargs -n 1 -I dir sudo find system/system/etc/dir -type f -exec chcon --reference=system/system/etc/permissions {} \;
-          sudo find system/product/{app,etc,overlay,priv-app} -type f -exec chcon --reference=system/product/etc/permissions/privapp-permissions-venezia.xml {} \;
+          sudo find system/product/{app,etc,overlay,priv-app} -type f -exec chcon --reference=system/product/etc/permissions/com.android.settings.intelligence.xml {} \;
           sudo patchelf --replace-needed libc.so "${HOME}/libc.so" ./magiskpolicy || true
           sudo patchelf --replace-needed libm.so "${HOME}/libm.so" ./magiskpolicy || true
           sudo patchelf --replace-needed libdl.so "${HOME}/libdl.so" ./magiskpolicy || true
@@ -512,6 +524,7 @@ jobs:
               fix_prop(sec, prop)
       - name: Umount images
         run: |
+          sudo find system -exec touch -amt 200901010000.00 {} \;> /dev/null 2>&1
           sudo umount system/vendor
           sudo umount system/product
           sudo umount system/system_ext

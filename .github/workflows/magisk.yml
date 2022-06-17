@@ -48,13 +48,13 @@ on:
         - tvstock
         - tvmini
       remove_amazon:
-        description: "Remove Amazon AppStore"
+        description: "删除亚马逊应用商店"
         required: true
         default: "keep"
         type: choice
         options:
-        - keep
-        - remove
+        - 保留
+        - 删除
       root_sol:
         description: "Root方案"
         required: true
@@ -309,7 +309,7 @@ jobs:
           sudo mount -o loop ${{ matrix.arch }}/product.img system/product
           sudo mount -o loop ${{ matrix.arch }}/system_ext.img system/system_ext
       - name: 删除亚马逊应用商店
-        if: ${{ github.event.inputs.remove_amazon == 'remove' }}
+        if: ${{ github.event.inputs.remove_amazon == '移除' }}
         run: |
           find system/product/{etc/permissions,etc/sysconfig,framework,priv-app} | grep -e amazon -e venezia | sudo xargs rm -rf
       - name: 安装Magisk

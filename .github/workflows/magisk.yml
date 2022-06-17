@@ -282,7 +282,7 @@ jobs:
           e2fsck -yf ${{ matrix.arch }}/system.img
           system_size=$(( $(du -sB512 ${{ matrix.arch }}/system.img | cut -f1) + 20000 ))
           if [ -d gapps ]; then
-            system_size=$(( $system_size + $(du -sB512 gapps | cut -f1) ))
+            system_size=$(( $system_size + $(du -sB512 gapps | cut -f1) - $(du -sB512 gapps/product | cut -f1) ))
           fi
           if [ -d magisk ]; then
             system_size=$(( $system_size +$(du -sB512 magisk | cut -f1) ))

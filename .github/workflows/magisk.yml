@@ -269,12 +269,16 @@ jobs:
           unzip -p gapps.zip {Core,GApps}/'*.lz' | tar --lzip -C gapps -xvf - -i --strip-components=2 --exclude='setupwizardtablet-x86_64' --exclude='packageinstallergoogle-all' --exclude='speech-common' --exclude='markup-lib-arm' --exclude='markup-lib-arm64' --exclude='markup-all' --exclude='setupwizarddefault-x86_64' --exclude='pixellauncher-all' --exclude='pixellauncher-common'
 
           # TODO: calculate the size dynamically for better compatibility
-          e2fsck -yf ${{ matrix.arch }}/product.img
-          resize2fs ${{ matrix.arch }}/product.img 1024M
           e2fsck -yf ${{ matrix.arch }}/system_ext.img
           resize2fs ${{ matrix.arch }}/system_ext.img 200M
       - name: Expand vendor and system
         run: |
+          e2fsck -yf ${{ matrix.arch }}/product.img
+          product_size=$(( $(du -sB512 ${{ matrix.arch }}/product.img | cut -f1) + 20000 ))
+          if [ -d gapps/product ]; then
+            product_size=$(( $product_size + $(du -sB512 gapps/product | cut -f1) ))
+          fi
+          resize2fs ${{ matrix.arch }}/product.img "$product_size"s
           e2fsck -yf ${{ matrix.arch }}/system.img
           system_size=$(( $(du -sB512 ${{ matrix.arch }}/system.img | cut -f1) + 20000 ))
           if [ -d gapps ]; then

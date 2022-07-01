@@ -534,6 +534,7 @@ jobs:
           sudo umount system/product
           sudo umount system/system_ext
           sudo umount system
+          sudo chown -R root:root system
       - name: Shrink images
         run: |
           e2fsck -yf ${{ matrix.arch }}/system.img

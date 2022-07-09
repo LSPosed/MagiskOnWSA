@@ -235,7 +235,7 @@ jobs:
               extract_as(zip, f"assets/boot_patch.sh", "boot_patch.sh", "magisk")
               extract_as(zip, f"assets/util_functions.sh", "util_functions.sh", "magisk")
       - name: Download OpenGApps
-        if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
+        if: ${{ github.event.inputs.gapps_variant != 'none' }}
         shell: python
         run: |
           import requests
@@ -271,10 +271,10 @@ jobs:
           print("done", flush=True)
 
       - name: Extract GApps
-        if: ${{ github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != '' }}
+        if: ${{ github.event.inputs.gapps_variant != 'none' }}
         run: |
           mkdir gapps
-          unzip -p gapps.zip {Core,GApps}/'*.lz' | tar --lzip -C gapps -xvf - -i --strip-components=2 --exclude='setupwizardtablet-x86_64' --exclude='packageinstallergoogle-all' --exclude='speech-common' --exclude='markup-lib-arm' --exclude='markup-lib-arm64' --exclude='markup-all' --exclude='setupwizarddefault-x86_64' --exclude='pixellauncher-all' --exclude='pixellauncher-common'
+          unzip -p gapps.zip {Core,GApps}/'*.lz' | tar --lzip -C gapps -xvf - -i --strip-components=2 --exclude='setupwizarddefault-x86_64' --exclude='setupwizarddefault-arm64' --exclude='setupwizardtablet-x86_64' --exclude='setupwizardtablet-arm64' --exclude='packageinstallergoogle-all' --exclude='speech-common' --exclude='markup-lib-arm' --exclude='markup-lib-arm64' --exclude='markup-all' --exclude='pixellauncher-all' --exclude='pixellauncher-common' --exclude='carriersetup-all' --exclude='carrierservices-all' --exclude='dialerframework-common' --exclude='dialergoogle-arm' --exclude='dialergoogle-arm64' --exclude='dialergoogle-common' --exclude='androidauto-x86_64' --exclude='androidauto-arm64' --exclude='gearheadstub-all' --exclude='quickaccesswallet-all' --exclude='projectfi-x86_64' --exclude='projectfi-arm64' --exclude='indic-x86_64' --exclude='indic-arm64' --exclude='japanese-x86_64' --exclude='japanese-arm64' --exclude='korean-x86_64' --exclude='korean-arm64' --exclude='pinyin-x86_64' --exclude='pinyin-arm64' --exclude='zhuyin-x86_64' --exclude='zhuyin-arm64'
 
       - name: Expand images
         run: |
@@ -310,7 +310,7 @@ jobs:
           sudo mount -o loop ${{ matrix.arch }}/product.img system/product
           sudo mount -o loop ${{ matrix.arch }}/system_ext.img system/system_ext
       - name: Remove Amazon AppStore
-        if: ${{ github.event.inputs.remove_amazon == 'remove' }}
+        if: ${{ github.event.inputs.remove_amazon == 'remove' && github.event.inputs.gapps_variant != 'none' }}
         run: |
           find system/product/{etc/permissions,etc/sysconfig,framework,priv-app} | grep -e amazon -e venezia | sudo xargs rm -rf
       - name: Integrate Magisk

@@ -34,7 +34,7 @@ on:
       gapps_variant:
         description: "Variants of gapps"
         required: true
-        default: "none"
+        default: "pico"
         type: choice
         options:
         - none
@@ -50,7 +50,7 @@ on:
       remove_amazon:
         description: "Remove Amazon AppStore"
         required: true
-        default: "keep"
+        default: "remove"
         type: choice
         options:
         - keep

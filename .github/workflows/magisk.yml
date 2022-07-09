@@ -310,7 +310,7 @@ jobs:
           sudo mount -o loop ${{ matrix.arch }}/product.img system/product
           sudo mount -o loop ${{ matrix.arch }}/system_ext.img system/system_ext
       - name: Remove Amazon AppStore
-        if: ${{ github.event.inputs.remove_amazon == 'remove' }}
+        if: ${{ github.event.inputs.remove_amazon == 'remove' && github.event.inputs.gapps_variant != 'none' && github.event.inputs.gapps_variant != ''}}
         run: |
           find system/product/{etc/permissions,etc/sysconfig,framework,priv-app} | grep -e amazon -e venezia | sudo xargs rm -rf
       - name: Integrate Magisk
